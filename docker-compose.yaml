@@ -1,0 +1,20 @@
+name: duel-code
+
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: duel-code
+    environment:
+      POSTGRES_DB: duel-code
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5433:5432"
+    volumes:
+      - leetcode_db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  leetcode_db_data:
