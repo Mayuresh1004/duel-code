@@ -56,3 +56,38 @@ export const onBoardUser = async ()=>{
         }
     }
 }
+
+
+export const  currentUserRole = async () => {
+    try {
+        const user = await currentUser();
+
+        if(!user){
+            return {
+                success:false,
+                error: "No Authenticated User Found"
+            }
+        }
+
+        const {id} = user;
+
+        const userRole = await db.user.findUnique({
+            where:{
+                clerkId:id
+            },
+            select:{
+                role: true
+            }
+
+        }) 
+
+        return userRole?.role
+
+    }
+    catch{
+            return {
+                success:false,
+                error: "Something went wrong"
+            }
+    }
+}
