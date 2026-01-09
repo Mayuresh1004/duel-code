@@ -28,9 +28,9 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
 
         {/* Page content */}
         <main className="absolute inset-0 flex items-center justify-center z-20">
-  <div className="bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text text-7xl font-bold text-transparent">
+  {/* <div className="bg-gradient-to-b from-neutral-200 to-neutral-500 bg-clip-text text-7xl font-bold text-transparent"> */}
     {children}
-  </div>
+  {/* </div> */}
 </main>
 
 
