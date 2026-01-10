@@ -1,7 +1,6 @@
 "use server"
 import db from "@/lib/db"
 import {currentUser, EmailAddress} from "@clerk/nextjs/server"
-import { email, success } from "zod"
 
 
 export const onBoardUser = async ()=>{
@@ -20,27 +19,34 @@ export const onBoardUser = async ()=>{
         }
         
         const {id, firstName, lastName, imageUrl, emailAddresses}:any = user
+
+        const email = user.primaryEmailAddress?.emailAddress;
+
+        if (!email) throw new Error("No primary email");
+
+
         
+        console.log("User is onboarding");
         const newUser = await db.user.upsert({
             
             where: {
                 clerkId: id
             },
-            update:{
-                firstName: firstName || null,
-                lastName: lastName || null,
-                imageUrl: imageUrl || null,
-                email: emailAddresses[0]?.emailAddress || ""
+            update: {
+            firstName: firstName ?? "",
+            lastName: lastName ?? "",
+            imageUrl: imageUrl || null ,
+            email,
             },
-            create:{
-                clerkId: id,
-                firstName: firstName || null,
-                lastName: lastName || null,
-                imageUrl: imageUrl || null,
-                email: emailAddresses[0]?.emailAddress || ""
+            create: {
+            clerkId: id,
+            firstName: firstName ?? "",
+            lastName: lastName ?? "",
+            imageUrl: imageUrl || null ,
+            email,
             },
+
         })
-        console.log("User is onboarding");
         console.log("User Onboarded");
         
         return {
@@ -50,11 +56,12 @@ export const onBoardUser = async ()=>{
         }
 
     } catch (error) {
-        return {
-            success:false,
-            error
-        }
-    }
+  console.error("Onboarding failed:", error)
+  return {
+    success: false,
+    error
+  }
+}
 }
 
 
