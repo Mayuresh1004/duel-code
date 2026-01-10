@@ -98,3 +98,27 @@ export const  currentUserRole = async () => {
             }
     }
 }
+
+export const getCurrentUser = async () => {
+    const user = await currentUser()
+
+    if(!user){
+            return {
+                success:false,
+                error: "No Authenticated User Found"
+            }
+        }
+
+
+        const dbUser = await db.user.findUnique({
+            where:{
+                clerkId:user.id
+            },
+            select:{
+                id: true
+            }
+
+        }) 
+
+        return dbUser?.id
+}
