@@ -2,7 +2,6 @@ import { UserRole } from "@/app/generated/prisma/enums";
 import db from "@/lib/db";
 import { getJudge0LanguageId, pollBatchResults, submitBatch } from "@/lib/judge0";
 import { currentUserRole, getCurrentUser } from "@/modules/auth/actions";
-import { currentUser } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request:NextRequest){
@@ -10,9 +9,9 @@ export async function POST(request:NextRequest){
 
         const userRole = await currentUserRole()
 
-        const user = await getCurrentUser();
+        const userId = await getCurrentUser();
 
-        if(!user || userRole!==UserRole.ADMIN){
+        if(!userId || userRole!==UserRole.ADMIN){
             return NextResponse.json({error:"Unauthorized"},{status:401})
         }
 
@@ -42,7 +41,7 @@ export async function POST(request:NextRequest){
 
             if(!referenceSolutions || typeof referenceSolutions !== 'object' ){
                                 
-                return NextResponse.json({error:"Reference solutions must bee provided for all supported languages"},{status:400})
+                return NextResponse.json({error:"Reference solutions must be provided for all supported languages"},{status:400})
 
             }
 
@@ -81,14 +80,38 @@ export async function POST(request:NextRequest){
                     const result = results[i];
 
                     if (result.status.id !== 3) {
+                    const errorMessage = result.stderr || result.compile_output || result.message || 'Unknown error';
+                    const statusDescription = result.status?.description || `Status ID: ${result.status.id}`;
+                    
+                    console.log(`Judge0 validation failed for ${language}:`, {
+                        statusId: result.status.id,
+                        statusDescription,
+                        errorMessage,
+                        stdout: result.stdout,
+                        expectedOutput: submissions[i].expected_output
+                    });
+                    
+                    // Build a more informative error message
+                    let detailedError = `Validation failed for ${language}`;
+                    if (statusDescription) {
+                        detailedError += `: ${statusDescription}`;
+                    }
+                    if (errorMessage && errorMessage !== 'Unknown error') {
+                        // Truncate long error messages for display
+                        const shortError = errorMessage.length > 100 ? errorMessage.substring(0, 100) + '...' : errorMessage;
+                        detailedError += ` - ${shortError}`;
+                    }
+                    
                     return NextResponse.json(
                         {
-                        error: `Validation failed for ${language}`,
+                        error: detailedError,
                         testCase: {
                             input: submissions[i].stdin,
                             expectedOutput: submissions[i].expected_output,
                             actualOutput: result.stdout,
-                            error: result.stderr || result.compile_output,
+                            error: errorMessage,
+                            status: statusDescription,
+                            statusId: result.status.id,
                         },
                         details: result,
                         },
@@ -113,7 +136,8 @@ export async function POST(request:NextRequest){
             testCases,
             codeSnippets,
             referenceSolution: referenceSolutions,
-            userId: user.id
+            
+            userId: userId
             }
         })
     
@@ -122,15 +146,37 @@ export async function POST(request:NextRequest){
             message: "Problem created successfully",
             data:newProblem,
         }, {status:201})
-    } catch (error) {
+    } catch (error: any) {
 
-        console.log("Error:",error);
+        console.error("Error creating problem:", error);
         
+        // Handle Prisma unique constraint errors
+        if (error?.code === 'P2002') {
+            const target = error?.meta?.target;
+            if (target && target.includes('title')) {
+                return NextResponse.json({
+                    success: false,
+                    error: "A problem with this title already exists. Please use a different title.",
+                }, {status: 400});
+            }
+        }
+        
+        // Provide more detailed error information
+        let errorMessage = "Failed to save the problem";
+        if (error instanceof Error) {
+            errorMessage = error.message;
+            console.error("Error details:", {
+                message: error.message,
+                stack: error.stack,
+                name: error.name,
+                code: (error as any).code
+            });
+        }
 
         return NextResponse.json({
 
             success:false,
-            error: "Failed to save the prblm",
+            error: errorMessage,
         }, {status:500})
     }
 }

@@ -21,7 +21,7 @@ export function NavbarHome({userRole}:any) {
   const navItems = [
     {
       name: "Problems",
-      link: "#problems",
+      link: "/problems",
     },
     {
       name: "About",
@@ -73,6 +73,8 @@ export function NavbarHome({userRole}:any) {
 
           </div>
         </NavBody>
+
+        
 
         {/* Mobile Navigation */}
         <MobileNav>

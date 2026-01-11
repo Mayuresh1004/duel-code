@@ -26,11 +26,11 @@ const CreateProblemPage = async () => {
                 </Button>
             </Link>
 
-            <h1 className='text-3xl font-bold text-[#1d73e5] shadow-2xl  shadow-blue-200'>
+            <h1 className='text-3xl font-bold text-[#1d73e5]'>
                 Welcome {user?.firstName} ! Create a Problem
             </h1>
             <ModeToggle />
-
+ 
         </div>
 
         <CreateProblemForm />

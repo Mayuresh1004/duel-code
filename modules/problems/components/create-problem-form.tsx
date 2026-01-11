@@ -99,13 +99,14 @@ const LANGUAGES = ["JAVASCRIPT", "PYTHON", "JAVA", "CPP", "GOLANG"] as const;
 
 const CodeEditor = ({ value, onChange, language = "java" }:any) => {
   // Map language names to Monaco Editor language IDs
-  const languageMap:any = {
-    javascript: "javascript",
-    python: "python",
-    java: "java",
-    cpp : "cpp",
-    go : "go"
-  };
+  const MONACO_LANGUAGE_MAP: Record<string, string> = {
+  JAVASCRIPT: "javascript",
+  PYTHON: "python",
+  JAVA: "java",
+  CPP: "cpp",
+  GOLANG: "go",
+};
+
 
 
   
@@ -118,7 +119,7 @@ const CodeEditor = ({ value, onChange, language = "java" }:any) => {
       <div className="h-75 w-full">
         <Editor
           height="300px"
-          defaultLanguage={languageMap[language]}
+          language={MONACO_LANGUAGE_MAP[language]}
           theme="vs-dark"
           value={value}
           onChange={onChange}
@@ -283,7 +284,24 @@ func main() {
             body:JSON.stringify(values)
         })
         const data = await response.json();
-        toast.success(data.message ?? "Problem created successfully");        router.push("/problems")
+        
+        if (!response.ok) {
+            console.error("Error response:", data);
+            const errorMsg = data.error ?? "Failed to create problem";
+            toast.error(errorMsg);
+            
+            // Log additional error details if available
+            if (data.testCase) {
+                console.error("Test case details:", data.testCase);
+            }
+            if (data.details) {
+                console.error("Judge0 details:", data.details);
+            }
+            return;
+        }
+        
+        toast.success(data.message ?? "Problem created successfully");        
+        router.push("/problems")
     } catch (error) {
           console.error("Error creating problem:", error);
       toast.error("Failed to create problem");
@@ -496,7 +514,7 @@ func main() {
                   <Button
                     type="button"
                     size="sm"
-                    onClick={() => appendTag([])}
+                    onClick={() => appendTag("")}
                     className="gap-2"
                   >
                     <Plus className="w-4 h-4" /> Add Tag
@@ -636,7 +654,7 @@ func main() {
                           <CodeEditor
                             value={field.value}
                             onChange={field.onChange}
-                            language={language.toLowerCase()}
+                            language={language}
                           />
                         )}
                       />

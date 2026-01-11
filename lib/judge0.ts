@@ -6,7 +6,7 @@ export function getJudge0LanguageId(language:any){
         "JAVASCRIPT" : 63,
         "JAVA" : 62,
         "CPP" : 54,
-        "GO" : 60
+        "GOLANG" : 60
     }
 
     return languageMap[language.toUpperCase()]
@@ -26,7 +26,7 @@ export async function submitBatch(submissions:any){
 
 export async function pollBatchResults(tokens:any){
     while(true){
-        const {data}:any = axios.get(
+        const {data}:any = await axios.get(
             `${process.env.JUDGE0_API_URL}/submissions/batch`,
             {
                 params:{
@@ -45,7 +45,7 @@ export async function pollBatchResults(tokens:any){
 
             if (isAllDone) return results;
 
-            setTimeout(()=>{},1000);
+        await new Promise(resolve => setTimeout(resolve, 1000));
 
         
     }
