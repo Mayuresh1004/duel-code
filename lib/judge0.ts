@@ -1,16 +1,29 @@
 import axios from "axios"
+export function getJudge0LanguageId(language: string | number) {
+  // If it's already a number, trust it
+  if (typeof language === "number") {
+    return language;
+  }
 
-export function getJudge0LanguageId(language:any){
-    const languageMap:any = {
-        "PYTHON" : 71,
-        "JAVASCRIPT" : 63,
-        "JAVA" : 62,
-        "CPP" : 54,
-        "GOLANG" : 60
-    }
+  const languageMap: Record<string, number> = {
+    PYTHON: 71,
+    JAVASCRIPT: 63,
+    JAVA: 62,
+    CPP: 54,
+    GOLANG: 60,
+  };
 
-    return languageMap[language.toUpperCase()]
+  const key = language.trim().toUpperCase();
+  const id = languageMap[key];
+
+  if (!id) {
+    throw new Error(`Unsupported language: ${language}`);
+  }
+
+  return id;
 }
+
+
 
 export async function submitBatch(submissions:any){
     const {data} = await axios.post(
