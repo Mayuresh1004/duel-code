@@ -410,6 +410,7 @@ const ProblemIdPage = ({ params }) => {
                             <code className="bg-muted px-2 py-1 rounded text-xs">
                               {testCase.input}
                             </code>
+{/* code */}
                           </div>
                           <div>
                             <span className="text-muted-foreground">
