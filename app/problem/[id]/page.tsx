@@ -428,7 +428,6 @@ const ProblemIdPage = ({ params }) => {
               </CardContent>
             </Card>
 
-            {/* Test Results and Submission Details */}
             {executionResponse && executionResponse.submission && (
               <div className="space-y-4 mt-4">
                 <SubmissionDetails submission={executionResponse.submission} />
