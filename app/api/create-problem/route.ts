@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
             testCases,
             codeSnippets,
             referenceSolutions,
+            driverCode,
             hints,
             editorial
         }: any = body;
