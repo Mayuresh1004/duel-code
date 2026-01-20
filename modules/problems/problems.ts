@@ -14,7 +14,7 @@ export const problems = {
       ],
       codeSnippets: {
         JAVASCRIPT: `function twoSum(nums, target) {\n  // Write your code here\n}`,
-        PYTHON: `class Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        pass`,
+        PYTHON: `from typing import List\n\nclass Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        pass`,
         JAVA: `class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        return new int[]{};\n    }\n}`,
         CPP: `class Solution {\npublic:\n    vector<int> twoSum(vector<int>& nums, int target) {\n        \n    }\n};`,
         GOLANG: `func twoSum(nums []int, target int) []int {\n    \n}`
@@ -25,6 +25,47 @@ export const problems = {
         JAVA: `import java.util.*;\n\npublic class Main {\n    public static int[] twoSum(int[] nums, int target) {\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int diff = target - nums[i];\n            if (map.containsKey(diff)) return new int[]{map.get(diff), i};\n            map.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n    \n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        int[] result = twoSum(nums, target);\n        System.out.println(Arrays.toString(result));\n    }\n}`,
         CPP: `#include <bits/stdc++.h>\nusing namespace std;\n\nvector<int> twoSum(vector<int>& nums, int target) {\n    unordered_map<int, int> m;\n    for (int i = 0; i < nums.size(); i++) {\n        int diff = target - nums[i];\n        if (m.count(diff)) return {m[diff], i};\n        m[nums[i]] = i;\n    }\n    return {};\n}\n\nint main() {\n    int n;\n    cin >> n;\n    vector<int> nums(n);\n    for (int i = 0; i < n; i++) cin >> nums[i];\n    int target;\n    cin >> target;\n    vector<int> result = twoSum(nums, target);\n    cout << "[" << result[0] << "," << result[1] << "]";\n    return 0;\n}`,
         GOLANG: `package main\n\nimport (\n    "bufio"\n    "fmt"\n    "os"\n    "strconv"\n    "strings"\n)\n\nfunc twoSum(nums []int, target int) []int {\n    m := make(map[int]int)\n    for i, n := range nums {\n        diff := target - n\n        if idx, ok := m[diff]; ok {\n            return []int{idx, i}\n        }\n        m[n] = i\n    }\n    return nil\n}\n\nfunc main() {\n    scanner := bufio.NewScanner(os.Stdin)\n    scanner.Scan()\n    n, _ := strconv.Atoi(scanner.Text())\n    scanner.Scan()\n    numsStr := strings.Fields(scanner.Text())\n    nums := make([]int, n)\n    for i, s := range numsStr {\n        nums[i], _ = strconv.Atoi(s)\n    }\n    scanner.Scan()\n    target, _ := strconv.Atoi(scanner.Text())\n    result := twoSum(nums, target)\n    fmt.Printf("[%d,%d]", result[0], result[1])\n}`
+      }
+    },
+    {
+      id: "contains_duplicate",
+      title: "Contains Duplicate",
+      difficulty: "EASY",
+      tags: ["Array", "Hash Table", "Sorting"],
+      description:
+        "Given an integer array `nums`, return `true` if any value appears at least twice in the array, and return `false` if every element is distinct.",
+      constraints: "1 <= nums.length <= 10^5\n-10^9 <= nums[i] <= 10^9",
+      testCases: [
+        { input: "4\n1 2 3 1", output: "true" },
+        { input: "4\n1 2 3 4", output: "false" }
+      ],
+      examples: {
+        JAVASCRIPT: { input: "4\n1 2 3 1", output: "true", explanation: "The number 1 appears twice." },
+        PYTHON: { input: "4\n1 2 3 1", output: "true", explanation: "The number 1 appears twice." },
+        JAVA: { input: "4\n1 2 3 1", output: "true", explanation: "The number 1 appears twice." },
+        CPP: { input: "4\n1 2 3 1", output: "true", explanation: "The number 1 appears twice." },
+        GOLANG: { input: "4\n1 2 3 1", output: "true", explanation: "The number 1 appears twice." }
+      },
+      codeSnippets: {
+        JAVASCRIPT: `function containsDuplicate(nums) {\n  // Write your code here\n}`,
+        PYTHON: `from typing import List\n\nclass Solution:\n    def containsDuplicate(self, nums: List[int]) -> bool:\n        pass`,
+        JAVA: `class Solution {\n    public boolean containsDuplicate(int[] nums) {\n        return false;\n    }\n}`,
+        CPP: `class Solution {\npublic:\n    bool containsDuplicate(vector<int>& nums) {\n        \n    }\n};`,
+        GOLANG: `func containsDuplicate(nums []int) bool {\n    \n}`
+      },
+      driverCode: {
+        JAVASCRIPT: `// @USER_CODE\n\nconst fs = require("fs");\nconst input = fs.readFileSync(0, "utf8").trim().split("\\n");\nconst n = parseInt(input[0] || "0", 10);\nconst nums = (input[1] || "").trim().split(/\\s+/).filter(Boolean).map(Number).slice(0, n);\nconsole.log(containsDuplicate(nums));`,
+        PYTHON: `# @USER_CODE\n\nif __name__ == "__main__":\n    import sys\n    data = sys.stdin.read().strip().split("\\n")\n    n = int(data[0])\n    nums = list(map(int, data[1].split()))[:n]\n    sol = Solution()\n    print(str(sol.containsDuplicate(nums)).lower())`,
+        JAVA: `import java.util.*;\n\n// @USER_CODE\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        Solution sol = new Solution();\n        System.out.print(sol.containsDuplicate(nums) ? "true" : "false");\n    }\n}`,
+        CPP: `#include <bits/stdc++.h>\nusing namespace std;\n\n// @USER_CODE\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n;\n    if (!(cin >> n)) return 0;\n    vector<int> nums(n);\n    for (int i = 0; i < n; i++) cin >> nums[i];\n    Solution sol;\n    cout << (sol.containsDuplicate(nums) ? "true" : "false");\n    return 0;\n}`,
+        GOLANG: `package main\n\nimport (\n    "bufio"\n    "fmt"\n    "os"\n)\n\n// @USER_CODE\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    if _, err := fmt.Fscan(in, &n); err != nil { return }\n    nums := make([]int, n)\n    for i := 0; i < n; i++ { fmt.Fscan(in, &nums[i]) }\n    if containsDuplicate(nums) {\n        fmt.Print("true")\n    } else {\n        fmt.Print("false")\n    }\n}`
+      },
+      referenceSolutions: {
+        JAVASCRIPT: `const fs = require("fs");\nconst input = fs.readFileSync(0, "utf8").trim().split("\\n");\nconst n = parseInt(input[0] || "0", 10);\nconst nums = (input[1] || "").trim().split(/\\s+/).filter(Boolean).map(Number).slice(0, n);\n\nfunction containsDuplicate(nums) {\n  const seen = new Set();\n  for (const x of nums) {\n    if (seen.has(x)) return true;\n    seen.add(x);\n  }\n  return false;\n}\n\nconsole.log(containsDuplicate(nums));`,
+        PYTHON: `import sys\n\ndef containsDuplicate(nums):\n    seen = set()\n    for x in nums:\n        if x in seen:\n            return True\n        seen.add(x)\n    return False\n\ndata = sys.stdin.read().strip().split(\"\\n\")\nn = int(data[0])\nnums = list(map(int, data[1].split()))[:n]\nprint(str(containsDuplicate(nums)).lower())`,
+        JAVA: `import java.util.*;\n\npublic class Main {\n    public static boolean containsDuplicate(int[] nums) {\n        HashSet<Integer> seen = new HashSet<>();\n        for (int x : nums) {\n            if (seen.contains(x)) return true;\n            seen.add(x);\n        }\n        return false;\n    }\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for (int i = 0; i < n; i++) nums[i] = sc.nextInt();\n        System.out.print(containsDuplicate(nums) ? \"true\" : \"false\");\n    }\n}`,
+        CPP: `#include <bits/stdc++.h>\nusing namespace std;\n\nbool containsDuplicate(vector<int>& nums) {\n    unordered_set<int> seen;\n    for (int x : nums) {\n        if (seen.count(x)) return true;\n        seen.insert(x);\n    }\n    return false;\n}\n\nint main() {\n    ios::sync_with_stdio(false);\n    cin.tie(nullptr);\n    int n;\n    cin >> n;\n    vector<int> nums(n);\n    for (int i = 0; i < n; i++) cin >> nums[i];\n    cout << (containsDuplicate(nums) ? \"true\" : \"false\");\n    return 0;\n}`,
+        GOLANG: `package main\n\nimport (\n    \"bufio\"\n    \"fmt\"\n    \"os\"\n)\n\nfunc containsDuplicate(nums []int) bool {\n    seen := make(map[int]bool)\n    for _, x := range nums {\n        if seen[x] { return true }\n        seen[x] = true\n    }\n    return false\n}\n\nfunc main() {\n    in := bufio.NewReader(os.Stdin)\n    var n int\n    fmt.Fscan(in, &n)\n    nums := make([]int, n)\n    for i := 0; i < n; i++ { fmt.Fscan(in, &nums[i]) }\n    if containsDuplicate(nums) { fmt.Print(\"true\") } else { fmt.Print(\"false\") }\n}\n`
       }
     },
   ],

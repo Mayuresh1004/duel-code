@@ -135,15 +135,44 @@ export async function submitBatch(submissions: any) {
       }
     }
 
-    const { data } = await axios.post(
-      `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=false`,
-      { submissions },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      }
-    )
+    const postBatch = async (base64Encoded: boolean, payload: any) => {
+      return await axios.post(
+        `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=${base64Encoded ? "true" : "false"}`,
+        payload,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    };
+
+    const encodeB64 = (val: unknown) =>
+      Buffer.from(String(val ?? ""), "utf8").toString("base64");
+
+    const toBase64Submissions = (subs: any[]) =>
+      subs.map((s) => ({
+        ...s,
+        source_code: encodeB64(s.source_code),
+        stdin: s.stdin !== undefined ? encodeB64(s.stdin) : undefined,
+        expected_output: s.expected_output !== undefined ? encodeB64(s.expected_output) : undefined,
+      }));
+
+    let data: any;
+    try {
+      const res = await postBatch(false, { submissions });
+      data = res.data;
+    } catch (error: any) {
+      const message = String(error?.response?.data?.error || error?.response?.data?.message || error?.message || "");
+      // Judge0 returns this when any field can't be converted to UTF-8.
+      const shouldRetryBase64 = message.toLowerCase().includes("utf-8") || message.toLowerCase().includes("base64_encoded=true");
+
+      if (!shouldRetryBase64) throw error;
+
+      console.warn("[submitBatch] UTF-8 conversion error; retrying with base64_encoded=true");
+      const res = await postBatch(true, { submissions: toBase64Submissions(submissions) });
+      data = res.data;
+    }
 
     console.log("Batch submission response: ", data);
 
@@ -178,6 +207,7 @@ export async function submitBatch(submissions: any) {
 export async function pollBatchResults(tokens: any) {
   let attempts = 0;
   const maxAttempts = 60; // 60 seconds timeout
+  let useBase64 = false;
 
   while (attempts < maxAttempts) {
     try {
@@ -186,7 +216,7 @@ export async function pollBatchResults(tokens: any) {
         {
           params: {
             tokens: tokens.join(","),
-            base64_encoded: false
+            base64_encoded: useBase64
           }
         }
       )
@@ -212,6 +242,14 @@ export async function pollBatchResults(tokens: any) {
       attempts++;
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error: any) {
+      const msg = String(error?.response?.data?.error || error?.response?.data?.message || error?.message || "");
+      const shouldRetryBase64 = !useBase64 && (msg.toLowerCase().includes("utf-8") || msg.toLowerCase().includes("base64_encoded=true"));
+      if (shouldRetryBase64) {
+        console.warn("[pollBatchResults] UTF-8 conversion error; retrying with base64_encoded=true");
+        useBase64 = true;
+        // don't count this as an attempt; retry immediately
+        continue;
+      }
       console.error("[pollBatchResults] Error polling results:", {
         message: error.message,
         response: error.response?.data,

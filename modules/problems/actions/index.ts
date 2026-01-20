@@ -7,6 +7,153 @@ import { currentUser } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 import { includes, success } from "zod"
 
+function getBuiltinDriverCode(problemTitle: string | undefined | null, languageKey: string) {
+    const title = (problemTitle || "").trim().toLowerCase();
+
+    // Built-in drivers for seeded problems (when DB driverCode is missing).
+    // These drivers expect the editor snippet to provide `class Solution { ... }` (CPP/JAVA)
+    // or `class Solution:` (PYTHON) and will call the appropriate method.
+    if (title === "valid palindrome") {
+        if (languageKey === "CPP") {
+            return `#include <bits/stdc++.h>
+using namespace std;
+
+// @USER_CODE
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(nullptr);
+
+    string s;
+    getline(cin, s);
+
+    Solution sol;
+    cout << (sol.isPalindrome(s) ? "true" : "false");
+    return 0;
+}`;
+        }
+
+        if (languageKey === "JAVA") {
+            return `import java.util.*;
+
+// @USER_CODE
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String s = sc.hasNextLine() ? sc.nextLine() : "";
+        Solution sol = new Solution();
+        System.out.print(sol.isPalindrome(s) ? "true" : "false");
+    }
+}`;
+        }
+
+        if (languageKey === "PYTHON") {
+            // If user provides class Solution with isPalindrome, call it and print lowercase true/false
+            return `# @USER_CODE
+
+if __name__ == "__main__":
+    import sys
+    s = sys.stdin.read()
+    # Keep line as-is (includes spaces/punctuation)
+    s = s.rstrip("\\n")
+    sol = Solution()
+    print(str(sol.isPalindrome(s)).lower())
+`;
+        }
+
+        if (languageKey === "GOLANG") {
+            return `package main
+
+import (
+    "fmt"
+    "io/ioutil"
+    "os"
+    "strings"
+    "unicode"
+)
+
+// @USER_CODE
+
+func main() {
+    b, _ := ioutil.ReadAll(os.Stdin)
+    // Note: this string literal must be escaped in the TS template,
+    // so Go receives backslashes rather than real newlines.
+    s := strings.TrimRight(string(b), "\\r\\n")
+    if isPalindrome(s) {
+        fmt.Print("true")
+    } else {
+        fmt.Print("false")
+    }
+}
+
+// helper to keep unicode imports used if user doesn't
+var _ = unicode.IsLetter
+`;
+        }
+    }
+
+    return null;
+}
+
+function prepareUserCodeForBuiltinWrapper(languageKey: string, userCode: string) {
+    const code = userCode || "";
+
+    // If user pasted a full program, keep as-is (the wrapper is skipped elsewhere).
+    if (shouldSkipBuiltinWrapper(languageKey, code)) return code;
+
+    if (languageKey === "GOLANG") {
+        const lines = code.split(/\r?\n/);
+        const out: string[] = [];
+        let skippingImportBlock = false;
+
+        for (const line of lines) {
+            const trimmed = line.trim();
+
+            // Remove package declarations
+            if (/^package\s+\w+/.test(trimmed)) continue;
+
+            // Remove import blocks: import ( ... )
+            if (!skippingImportBlock && /^import\s*\(\s*$/.test(trimmed)) {
+                skippingImportBlock = true;
+                continue;
+            }
+            if (skippingImportBlock) {
+                if (/^\)\s*$/.test(trimmed)) {
+                    skippingImportBlock = false;
+                }
+                continue;
+            }
+
+            // Remove single-line imports: import "x"
+            if (/^import\s+["`]/.test(trimmed)) continue;
+
+            out.push(line);
+        }
+
+        return out.join("\n").trim();
+    }
+
+    return code;
+}
+
+function shouldSkipBuiltinWrapper(languageKey: string, sourceCode: string) {
+    const code = sourceCode || "";
+    if (languageKey === "GOLANG") {
+        return /(^|\n)\s*package\s+main\b/.test(code) || /\bfunc\s+main\s*\(/.test(code);
+    }
+    if (languageKey === "CPP") {
+        return /\bint\s+main\s*\(/.test(code);
+    }
+    if (languageKey === "JAVA") {
+        return /\bpublic\s+static\s+void\s+main\s*\(/.test(code) || /\bclass\s+Main\b/.test(code);
+    }
+    if (languageKey === "PYTHON") {
+        return /if\s+__name__\s*==\s*["']__main__["']\s*:/.test(code);
+    }
+    return false;
+}
+
 
 
 export const getAllProblems = async () => {
@@ -51,7 +198,7 @@ export const getAllProblems = async () => {
 }
 
 
-export const getProblembyId = async (id) => {
+export const getProblembyId = async (id: string) => {
     try {
 
         const problem = await db.problem.findUnique({
@@ -70,7 +217,7 @@ export const getProblembyId = async (id) => {
 }
 
 
-export const deleteProblem = async (problemId) => {
+export const deleteProblem = async (problemId: string) => {
     try {
         const user = await currentUser();
 
@@ -107,7 +254,13 @@ export const deleteProblem = async (problemId) => {
 }
 
 
-export const runCode = async (source_code, language, stdin, expected_output, id) => {
+export const runCode = async (
+    source_code: string,
+    language: string | number,
+    stdin: string[],
+    expected_output: string[],
+    id: string
+) => {
     // This is for "Run" button - runs against public test cases (stdin provided by client)
     const user = await currentUser();
     // Verify user exists but don't strictly require DB user for just running code? 
@@ -134,13 +287,25 @@ export const runCode = async (source_code, language, stdin, expected_output, id)
     const problem = await db.problem.findUnique({ where: { id } });
     let finalSourceCode = source_code;
 
-    if (problem?.driverCode && problem.driverCode[language.toUpperCase()]) {
-        const driver = problem.driverCode[language.toUpperCase()];
-        // Language-aware replacement of placeholder
-        finalSourceCode = replaceUserCodeInDriver(driver, source_code, language);
-        console.log(`[runCode] Driver code applied for ${language}. Final code length: ${finalSourceCode.length}`);
+    const languageKey = typeof language === "string" ? language.toUpperCase() : String(language);
+    const driverFromDb = problem?.driverCode && typeof problem.driverCode === "object"
+        ? (problem.driverCode as any)[languageKey]
+        : null;
+    const builtinDriverRaw = getBuiltinDriverCode(problem?.title as any, languageKey);
+    const builtinDriver = builtinDriverRaw && !shouldSkipBuiltinWrapper(languageKey, source_code)
+        ? builtinDriverRaw
+        : null;
+
+    // Prefer built-in drivers for seeded problems (they match our class-based snippets).
+    const driverToUse = builtinDriver || driverFromDb;
+    if (driverToUse) {
+        const userCodeForWrapper = builtinDriver
+            ? prepareUserCodeForBuiltinWrapper(languageKey, source_code)
+            : source_code;
+        finalSourceCode = replaceUserCodeInDriver(driverToUse, userCodeForWrapper, language);
+        console.log(`[runCode] Driver code applied for ${languageKey}${builtinDriver ? " (builtin)" : " (db)"} . Final code length: ${finalSourceCode.length}`);
     } else {
-        console.log(`[runCode] No driver code found for ${language}, using user code directly`);
+        console.log(`[runCode] No driver code found for ${languageKey}, using user code directly`);
     }
 
     const judge0Id = getJudge0LanguageId(language);
@@ -197,36 +362,65 @@ export const runCode = async (source_code, language, stdin, expected_output, id)
         return { success: false, error: error.message || "Failed to get execution results" };
     }
 
+    const decodeBase64Safe = (value: string | null | undefined) => {
+        if (!value) return null;
+        // Only attempt base64 decode if it looks like base64
+        const looksBase64 = /^[A-Za-z0-9+/]+={0,2}$/.test(value) && value.length % 4 === 0;
+        if (!looksBase64) return value;
+        try {
+            const decoded = Buffer.from(value, "base64").toString("utf8");
+            // Heuristic: decoded text should have printable chars; if not, keep original
+            if (!decoded || decoded.includes("\uFFFD")) return value;
+            return decoded;
+        } catch {
+            return value;
+        }
+    };
+
     // Check for compilation errors or runtime errors first
     const hasCompilationError = results.some((r: any) => r.status.id === 6 || r.compile_output);
     const hasRuntimeError = results.some((r: any) => r.status.id >= 7 && r.status.id <= 12);
     
     if (hasCompilationError || hasRuntimeError) {
-        const firstError = results.find((r: any) => r.status.id === 6 || (r.status.id >= 7 && r.status.id <= 12) || r.compile_output || r.stderr);
+        const firstError = results.find((r: any) =>
+            r.status?.id === 6 ||
+            (r.status?.id >= 7 && r.status?.id <= 12) ||
+            r.compile_output ||
+            r.stderr ||
+            r.message
+        );
         return {
             success: false,
             error: firstError?.status?.description || "Compilation or Runtime Error",
             data: {
                 status: firstError?.status?.description || "Error",
-                results: results.map((result: any, i: number) => ({
+                results: results.map((result: any, i: number) => {
+                    const stdoutDecoded = decodeBase64Safe(result.stdout);
+                    const stderrDecoded = decodeBase64Safe(result.stderr);
+                    const compileDecoded = decodeBase64Safe(result.compile_output);
+                    return {
                     testCase: i + 1,
                     passed: false,
-                    stdout: result.stdout?.trim() || null,
+                    stdout: stdoutDecoded?.trim() || null,
                     expected: expected_output[i]?.trim(),
-                    stderr: result.stderr || null,
-                    compile_output: result.compile_output || null,
+                    stderr: stderrDecoded,
+                    compile_output: compileDecoded,
+                    message: result.message || null,
                     status: result.status.description,
                     statusId: result.status.id,
                     memory: result.memory ? `${result.memory} KB` : undefined,
                     time: result.time ? `${result.time} s` : undefined,
-                })),
+                }}),
             },
         };
     }
 
     let allPassed = true;
     const detailedResults = results.map((result: any, i: number) => {
-        const stdout = result.stdout?.trim() || null;
+        const stdoutDecoded = decodeBase64Safe(result.stdout);
+        const stderrDecoded = decodeBase64Safe(result.stderr);
+        const compileDecoded = decodeBase64Safe(result.compile_output);
+        const stdout = stdoutDecoded?.trim() || null;
         const expected_outputs = expected_output[i]?.trim();
         const passed = stdout === expected_outputs;
         if (!passed) allPassed = false;
@@ -236,8 +430,9 @@ export const runCode = async (source_code, language, stdin, expected_output, id)
             passed,
             stdout,
             expected: expected_outputs,
-            stderr: result.stderr || null,
-            compile_output: result.compile_output || null,
+            stderr: stderrDecoded,
+            compile_output: compileDecoded,
+            message: result.message || null,
             status: result.status.description,
             statusId: result.status.id,
             memory: result.memory ? `${result.memory} KB` : undefined,
@@ -255,7 +450,11 @@ export const runCode = async (source_code, language, stdin, expected_output, id)
     };
 };
 
-export const submitCode = async (source_code, language, problemId) => {
+export const submitCode = async (
+    source_code: string,
+    language: string | number,
+    problemId: string
+) => {
     // This is for "Submit" button - runs against ALL test cases (hidden in DB)
     const user = await currentUser();
     if (!user) return { success: false, error: "Unauthorized" };
@@ -284,11 +483,23 @@ export const submitCode = async (source_code, language, problemId) => {
         languageKey = languageIdMap[language] || null;
     }
 
-    if (languageKey && problem.driverCode && problem.driverCode[languageKey]) {
-        const driver = problem.driverCode[languageKey];
-        // Language-aware replacement of placeholder
-        finalSourceCode = replaceUserCodeInDriver(driver, source_code, language);
-        console.log(`[submitCode] Driver code applied for ${languageKey}. Final code length: ${finalSourceCode.length}`);
+    const driverFromDb = languageKey && problem.driverCode && typeof problem.driverCode === "object"
+        ? (problem.driverCode as any)[languageKey]
+        : null;
+    const builtinDriverRaw = getBuiltinDriverCode(problem?.title as any, languageKey || String(language));
+    const builtinDriver = builtinDriverRaw && !shouldSkipBuiltinWrapper(languageKey || String(language), source_code)
+        ? builtinDriverRaw
+        : null;
+
+    // Prefer built-in drivers for seeded problems (they match our class-based snippets).
+    const driverToUse = builtinDriver || driverFromDb;
+
+    if (driverToUse) {
+        const userCodeForWrapper = builtinDriver
+            ? prepareUserCodeForBuiltinWrapper(languageKey || String(language), source_code)
+            : source_code;
+        finalSourceCode = replaceUserCodeInDriver(driverToUse, userCodeForWrapper, language);
+        console.log(`[submitCode] Driver code applied for ${languageKey || language}${builtinDriver ? " (builtin)" : " (db)"} . Final code length: ${finalSourceCode.length}`);
     } else {
         console.log(`[submitCode] No driver code found for ${languageKey || language}, using user code directly`);
     }
@@ -307,7 +518,7 @@ export const submitCode = async (source_code, language, problemId) => {
 
     console.log(`[submitCode] Language: ${language}, Judge0 ID: ${judge0Id}, Code preview: ${finalSourceCode.substring(0, 200)}...`);
 
-    const submissions = testCases.map((tc) => ({
+    const submissions = testCases.map((tc: any) => ({
         source_code: finalSourceCode,
         language_id: judge0Id,
         stdin: tc.input || "",
@@ -358,7 +569,13 @@ export const submitCode = async (source_code, language, problemId) => {
     const hasRuntimeError = results.some((r: any) => r.status.id >= 7 && r.status.id <= 12);
     
     if (hasCompilationError || hasRuntimeError) {
-        const firstError = results.find((r: any) => r.status.id === 6 || (r.status.id >= 7 && r.status.id <= 12) || r.compile_output || r.stderr);
+        const firstError = results.find((r: any) =>
+            r.status?.id === 6 ||
+            (r.status?.id >= 7 && r.status?.id <= 12) ||
+            r.compile_output ||
+            r.stderr ||
+            r.message
+        );
         return {
             success: false,
             error: firstError?.status?.description || "Compilation or Runtime Error",
@@ -371,6 +588,7 @@ export const submitCode = async (source_code, language, problemId) => {
                     expected: testCases[i].output?.trim(),
                     stderr: result.stderr || null,
                     compile_output: result.compile_output || null,
+                    message: result.message || null,
                     status: result.status.description,
                     statusId: result.status.id,
                     memory: result.memory ? `${result.memory} KB` : undefined,
@@ -394,6 +612,7 @@ export const submitCode = async (source_code, language, problemId) => {
             expected: expected_outputs,
             stderr: result.stderr || null,
             compile_output: result.compile_output || null,
+            message: result.message || null,
             status: result.status.description,
             statusId: result.status.id,
             memory: result.memory ? `${result.memory} KB` : undefined,
@@ -423,13 +642,13 @@ export const submitCode = async (source_code, language, problemId) => {
             problemId: problem.id,
             sourceCode: source_code, // Store ORIGINAL user code
             language: languageString,
-            stdin: JSON.stringify(testCases.map(tc => tc.input)),
-            stdout: JSON.stringify(detailedResults.map(r => r.stdout)),
-            stderr: JSON.stringify(detailedResults.map(r => r.stderr)),
-            compileOutput: JSON.stringify(detailedResults.map(r => r.compile_output)),
+            stdin: JSON.stringify(testCases.map((tc: any) => tc.input)),
+            stdout: JSON.stringify(detailedResults.map((r: any) => r.stdout)),
+            stderr: JSON.stringify(detailedResults.map((r: any) => r.stderr)),
+            compileOutput: JSON.stringify(detailedResults.map((r: any) => r.compile_output)),
             status: allPassed ? "Accepted" : "Wrong Answer",
-            memory: JSON.stringify(detailedResults.map(r => r.memory)),
-            time: JSON.stringify(detailedResults.map(r => r.time)),
+            memory: JSON.stringify(detailedResults.map((r: any) => r.memory)),
+            time: JSON.stringify(detailedResults.map((r: any) => r.time)),
         }
     });
 
@@ -446,7 +665,7 @@ export const submitCode = async (source_code, language, problemId) => {
         })
     }
 
-    const testCaseResults = detailedResults.map((result) => ({
+    const testCaseResults = detailedResults.map((result: any) => ({
         submissionId: submission.id,
         testCase: result.testCase,
         passed: result.passed,

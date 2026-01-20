@@ -12,16 +12,18 @@ export const TestCaseTable = ({ testCases }) => {
           <TableRow>
             <TableHead className="w-[100px]">Case #</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Judge0</TableHead>
             <TableHead>Memory</TableHead>
             <TableHead>Time</TableHead>
             <TableHead>Output</TableHead>
             <TableHead>Expected</TableHead>
+            <TableHead>Error</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {testCases.map((testCase, index) => (
-            <TableRow key={testCase.id}>
-              <TableCell className="font-medium">Test {index + 1}</TableCell>
+            <TableRow key={testCase.id ?? testCase.testCase ?? index}>
+              <TableCell className="font-medium">Test {testCase.testCase ?? index + 1}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   {testCase.passed ? (
@@ -37,6 +39,9 @@ export const TestCaseTable = ({ testCases }) => {
                   )}
                 </div>
               </TableCell>
+              <TableCell className="max-w-[160px] truncate font-mono text-xs">
+                {testCase.status ?? ""}{testCase.statusId ? ` (${testCase.statusId})` : ""}
+              </TableCell>
               <TableCell>{testCase.memory}</TableCell>
               <TableCell>{testCase.time}</TableCell>
               <TableCell className="max-w-[200px] truncate font-mono text-sm">
@@ -44,6 +49,11 @@ export const TestCaseTable = ({ testCases }) => {
               </TableCell>
               <TableCell className="max-w-[200px] truncate font-mono text-sm">
                 {testCase.expected}
+              </TableCell>
+              <TableCell className="max-w-[420px] font-mono text-xs">
+                <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words rounded bg-muted p-2">
+                  {testCase.stderr || testCase.compile_output || testCase.message || ""}
+                </pre>
               </TableCell>
             </TableRow>
           ))}

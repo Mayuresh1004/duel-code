@@ -91,6 +91,15 @@ const problemSchema = z.object({
     CPP: z.string().min(1, "Java solution is required"),
     GOLANG: z.string().min(1, "Java solution is required"),
   }),
+  driverCode: z
+    .object({
+      JAVASCRIPT: z.string().optional(),
+      PYTHON: z.string().optional(),
+      JAVA: z.string().optional(),
+      CPP: z.string().optional(),
+      GOLANG: z.string().optional(),
+    })
+    .optional(),
 });
 
 
@@ -148,6 +157,7 @@ const CreateProblemForm = () => {
   type SampleType = keyof typeof problems;
 
    const [sampleType, setSampleType] = useState<SampleType>("ARRAY");
+   const [sampleIndex, setSampleIndex] = useState(0);
   const [isLoading,setIsLoading] = useState(false)
 
 
@@ -240,6 +250,14 @@ func main() {
     JAVA: "// Add your reference solution here",
     CPP: "// Add your reference solution here",
     GOLANG: "// Add your reference solution here",
+  },
+
+  driverCode: {
+    JAVASCRIPT: "",
+    PYTHON: "",
+    JAVA: "",
+    CPP: "",
+    GOLANG: "",
   },
 }
 
@@ -343,7 +361,10 @@ func main() {
                     
                     <Select
                       value={sampleType}
-                      onValueChange={(value) => setSampleType(value as SampleType)}
+                      onValueChange={(value) => {
+                        setSampleType(value as SampleType);
+                        setSampleIndex(0);
+                      }}
                     >
                       <SelectTrigger className="mt-2">
                         <SelectValue placeholder="Select Topic" />
@@ -370,6 +391,21 @@ func main() {
                       </SelectContent>
                     </Select>
 
+                    <Select
+                      value={String(sampleIndex)}
+                      onValueChange={(value) => setSampleIndex(parseInt(value, 10))}
+                    >
+                      <SelectTrigger className="mt-2">
+                        <SelectValue placeholder="Select Sample" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {(problems[sampleType] || []).map((p, idx) => (
+                          <SelectItem key={p.id ?? idx} value={String(idx)}>
+                            {p.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   
                 
                 {/* {errors.sa && (
@@ -401,7 +437,7 @@ func main() {
                 type="button"
                 variant="secondary"
                 size="sm"
-                onClick={() => loadSampleData(sampleType, 0)}
+                onClick={() => loadSampleData(sampleType, sampleIndex)}
                 className="gap-2"
               >
 
@@ -514,7 +550,7 @@ func main() {
                   <Button
                     type="button"
                     size="sm"
-                    onClick={() => appendTag("")}
+                    onClick={() => appendTag("" as any)}
                     className="gap-2"
                   >
                     <Plus className="w-4 h-4" /> Add Tag
@@ -691,6 +727,33 @@ func main() {
                           {errors.referenceSolutions[language].message}
                         </p>
                       )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Driver Code (Optional) */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-slate-600" />
+                        Driver Code (Optional)
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-2">
+                      <p className="text-xs text-muted-foreground">
+                        Use <code className="font-mono">// @USER_CODE</code> (or <code className="font-mono"># @USER_CODE</code> for Python)
+                        as the placeholder where user code should be injected.
+                      </p>
+                      <Controller
+                        name={`driverCode.${language}`}
+                        control={control}
+                        render={({ field }) => (
+                          <CodeEditor
+                            value={field.value}
+                            onChange={field.onChange}
+                            language={language.toLowerCase()}
+                          />
+                        )}
+                      />
                     </CardContent>
                   </Card>
 

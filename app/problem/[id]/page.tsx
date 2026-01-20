@@ -38,7 +38,8 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { getJudge0LanguageId } from "@/lib/judge0";
 import { toast } from "sonner";
 import Link from "next/link";
-import { executeCode, getProblembyId } from "@/modules/problems/actions";
+import { useParams } from "next/navigation";
+import { executeCode, getProblembyId, submitCode } from "@/modules/problems/actions";
 import { SubmissionDetails } from "@/modules/problems/components/submission-details";
 import { TestCaseTable } from "@/modules/problems/components/test-case-table";
 // import { SubmissionDetails } from "@/modules/problems/components/submission-details";
@@ -58,7 +59,8 @@ const getDifficultyColor = (difficulty) => {
   }
 };
 
-const ProblemIdPage = ({ params }) => {
+const ProblemIdPage = () => {
+  const params = useParams();
   const [problem, setProblem] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT");
   const [code, setCode] = useState("");
@@ -72,8 +74,10 @@ const ProblemIdPage = ({ params }) => {
   useEffect(() => {
     const fetchProblem = async () => {
       try {
-        const resolvedParams = await params;
-        const problemData = await getProblembyId(resolvedParams.id);
+        const problemId = params?.id;
+        if (!problemId || typeof problemId !== "string") return;
+
+        const problemData = await getProblembyId(problemId);
         if (problemData.success) {
           console.log(problemData.data);
           setProblem(problemData.data);
@@ -86,7 +90,7 @@ const ProblemIdPage = ({ params }) => {
     };
 
     fetchProblem();
-  }, [params]);
+  }, [params?.id]);
 
   //     useEffect(()=>{
   //     const fetchSubmissionHistory = async()=>{
@@ -115,7 +119,6 @@ const ProblemIdPage = ({ params }) => {
   const handleRun = async () => {
     try {
       setIsRunning(true);
-      const language_id = getJudge0LanguageId(selectedLanguage);
       const stdin = problem.testCases.map((tc) => tc.input);
       const expected_outputs = problem.testCases.map((tc) => tc.output);
       // Run against public test cases only
@@ -431,6 +434,12 @@ const ProblemIdPage = ({ params }) => {
               <div className="space-y-4 mt-4">
                 <SubmissionDetails submission={executionResponse.submission} />
                 <TestCaseTable testCases={executionResponse.submission.testCases} />
+              </div>
+            )}
+
+            {executionResponse && executionResponse.data?.results && (
+              <div className="space-y-4 mt-4">
+                <TestCaseTable testCases={executionResponse.data.results} />
               </div>
             )}
 
