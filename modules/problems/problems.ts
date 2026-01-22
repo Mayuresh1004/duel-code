@@ -1,4 +1,8 @@
 // problems.ts
+import { batch1 } from "./problems-batch-1";
+import { batch2 } from "./problems-batch-2";
+import { batch3 } from "./problems-batch-3";
+
 export const problems = {
   ARRAY: [
     {
@@ -126,5 +130,6 @@ export const problems = {
         GOLANG: `package main\n\nimport (\n    "bufio"\n    "fmt"\n    "os"\n    "strconv"\n)\n\nfunc climbStairs(n int) int {\n    a, b := 1, 1\n    for i := 0; i < n; i++ {\n        a, b = b, a+b\n    }\n    return a\n}\n\nfunc main() {\n    scanner := bufio.NewScanner(os.Stdin)\n    scanner.Scan()\n    n, _ := strconv.Atoi(scanner.Text())\n    fmt.Println(climbStairs(n))\n}`
       }
     }
-  ]
+  ],
+  PRACTICE: [...batch1, ...batch2, ...batch3]
 } as const;
