@@ -183,7 +183,7 @@ const ProblemIdPage = () => {
         <div className="mb-6 flex items-start justify-between">
           <div>
             <div className="flex items-center gap-4 mb-4">
-              <Link href="/">
+              <Link href="/problems">
                 <Button variant="outline" size="icon">
                   <ArrowLeft className="size-4" />
                 </Button>

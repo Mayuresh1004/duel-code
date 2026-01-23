@@ -4,12 +4,19 @@ export const batch1 = [
         title: "Reverse String",
         difficulty: "EASY",
         tags: ["String", "Two Pointers"],
-        description: "Write a function that reverses a string. The input string is given as an array of characters.",
-        constraints: "1 <= s.length <= 10^5",
+        description: "Write a function that reverses a string. The input string is given as an array of characters \`s\`.\n\nYou must do this by modifying the input array [in-place](https://en.wikipedia.org/wiki/In-place_algorithm) with \`O(1)\` extra memory.",
+        constraints: "1 <= s.length <= 10^5\ns[i] is a printable ascii character.",
         testCases: [
             { input: "5\nh e l l o", output: '["o","l","l","e","h"]' },
             { input: "6\nH a n n a h", output: '["h","a","n","n","a","H"]' }
         ],
+        examples: {
+            JAVASCRIPT: { input: "5\nh e l l o", output: '["o","l","l","e","h"]', explanation: "" },
+            PYTHON: { input: "5\nh e l l o", output: '["o","l","l","e","h"]', explanation: "" },
+            JAVA: { input: "5\nh e l l o", output: '["o","l","l","e","h"]', explanation: "" },
+            CPP: { input: "5\nh e l l o", output: '["o","l","l","e","h"]', explanation: "" },
+            GOLANG: { input: "5\nh e l l o", output: '["o","l","l","e","h"]', explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {character[]} s\n * @return {void} Do not return anything, modify s in-place instead.\n */\nvar reverseString = function(s) {\n    \n};`,
             PYTHON: `class Solution:\n    def reverseString(self, s: List[str]) -> None:\n        """\n        Do not return anything, modify s in-place instead.\n        """\n        pass`,
@@ -44,12 +51,20 @@ console.log(JSON.stringify(s));`,
         title: "Single Number",
         difficulty: "EASY",
         tags: ["Array", "Bit Manipulation"],
-        description: "Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.",
-        constraints: "1 <= nums.length <= 3 * 10^4",
+        description: "Given a **non-empty** array of integers \`nums\`, every element appears twice except for one. Find that single one.\n\nYou must implement a solution with a linear runtime complexity and use only constant extra space.",
+        constraints: "1 <= nums.length <= 3 * 10^4\n-3 * 10^4 <= nums[i] <= 3 * 10^4\nEach element in the array appears twice except for one element which appears only once.",
         testCases: [
             { input: "3\n2 2 1", output: "1" },
-            { input: "5\n4 1 2 1 2", output: "4" }
+            { input: "5\n4 1 2 1 2", output: "4" },
+            { input: "1\n1", output: "1" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "3\n2 2 1", output: "1", explanation: "" },
+            PYTHON: { input: "3\n2 2 1", output: "1", explanation: "" },
+            JAVA: { input: "3\n2 2 1", output: "1", explanation: "" },
+            CPP: { input: "3\n2 2 1", output: "1", explanation: "" },
+            GOLANG: { input: "3\n2 2 1", output: "1", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @return {number}\n */\nvar singleNumber = function(nums) {\n    \n};`,
             PYTHON: `class Solution:\n    def singleNumber(self, nums: List[int]) -> int:\n        pass`,
@@ -83,12 +98,20 @@ console.log(singleNumber(nums));`,
         title: "Fizz Buzz",
         difficulty: "EASY",
         tags: ["Math", "String"],
-        description: "Given an integer n, return a string array answer (1-indexed) where answer[i] == 'FizzBuzz' if i is divisible by 3 and 5, 'Fizz' if divisible by 3, 'Buzz' if divisible by 5, and i as a string otherwise.",
+        description: "Given an integer \`n\`, return a string array \`answer\` (**1-indexed**) where:\n\n- \`answer[i] == \"FizzBuzz\"\` if \`i\` is divisible by \`3\` and \`5\`.\n- \`answer[i] == \"Fizz\"\` if \`i\` is divisible by \`3\`.\n- \`answer[i] == \"Buzz\"\` if \`i\` is divisible by \`5\`.\n- \`answer[i] == i\` (as a string) if none of the above conditions are true.",
         constraints: "1 <= n <= 10^4",
         testCases: [
             { input: "3", output: '["1","2","Fizz"]' },
-            { input: "5", output: '["1","2","Fizz","4","Buzz"]' }
+            { input: "5", output: '["1","2","Fizz","4","Buzz"]' },
+            { input: "15", output: '["1","2","Fizz","4","Buzz","Fizz","7","8","Fizz","Buzz","11","Fizz","13","14","FizzBuzz"]' }
         ],
+        examples: {
+            JAVASCRIPT: { input: "3", output: '["1","2","Fizz"]', explanation: "" },
+            PYTHON: { input: "3", output: '["1","2","Fizz"]', explanation: "" },
+            JAVA: { input: "3", output: '["1","2","Fizz"]', explanation: "" },
+            CPP: { input: "3", output: '["1","2","Fizz"]', explanation: "" },
+            GOLANG: { input: "3", output: '["1","2","Fizz"]', explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number} n\n * @return {string[]}\n */\nvar fizzBuzz = function(n) {\n    \n};`,
             PYTHON: `class Solution:\n    def fizzBuzz(self, n: int) -> List[str]:\n        pass`,
@@ -116,12 +139,19 @@ console.log(singleNumber(nums));`,
         title: "Majority Element",
         difficulty: "EASY",
         tags: ["Array", "HashTable"],
-        description: "Given an array integers numbers of size n, return the majority element. The majority element is the element that appears more than n / 2 times.",
-        constraints: "1 <= n <= 5 * 10^4",
+        description: "Given an array \`nums\` of size \`n\`, return the majority element.\n\nThe majority element is the element that appears more than \`⌊n / 2⌋\` times. You may assume that the majority element always exists in the array.",
+        constraints: "1 <= n <= 5 * 10^4\n-10^9 <= nums[i] <= 10^9",
         testCases: [
             { input: "3\n3 2 3", output: "3" },
             { input: "7\n2 2 1 1 1 2 2", output: "2" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "3\n3 2 3", output: "3", explanation: "" },
+            PYTHON: { input: "3\n3 2 3", output: "3", explanation: "" },
+            JAVA: { input: "3\n3 2 3", output: "3", explanation: "" },
+            CPP: { input: "3\n3 2 3", output: "3", explanation: "" },
+            GOLANG: { input: "3\n3 2 3", output: "3", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @return {number}\n */\nvar majorityElement = function(nums) {\n    \n};`,
             PYTHON: `class Solution:\n    def majorityElement(self, nums: List[int]) -> int:\n        pass`,
@@ -149,12 +179,19 @@ console.log(singleNumber(nums));`,
         title: "Move Zeroes",
         difficulty: "EASY",
         tags: ["Array", "Two Pointers"],
-        description: "Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements. Note that you must do this in-place without making a copy of the array.",
-        constraints: "1 <= nums.length <= 10^4",
+        description: "Given an integer array \`nums\`, move all \`0\`'s to the end of it while maintaining the relative order of the non-zero elements.\n\n**Note** that you must do this in-place without making a copy of the array.",
+        constraints: "1 <= nums.length <= 10^4\n-2^31 <= nums[i] <= 2^31 - 1",
         testCases: [
             { input: "5\n0 1 0 3 12", output: "[1,3,12,0,0]" },
             { input: "1\n0", output: "[0]" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "5\n0 1 0 3 12", output: "[1,3,12,0,0]", explanation: "" },
+            PYTHON: { input: "5\n0 1 0 3 12", output: "[1,3,12,0,0]", explanation: "" },
+            JAVA: { input: "5\n0 1 0 3 12", output: "[1,3,12,0,0]", explanation: "" },
+            CPP: { input: "5\n0 1 0 3 12", output: "[1,3,12,0,0]", explanation: "" },
+            GOLANG: { input: "5\n0 1 0 3 12", output: "[1,3,12,0,0]", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @return {void} Do not return anything, modify nums in-place instead.\n */\nvar moveZeroes = function(nums) {\n    \n};`,
             PYTHON: `class Solution:\n    def moveZeroes(self, nums: List[int]) -> None:\n        """\n        Do not return anything, modify nums in-place instead.\n        """\n        pass`,

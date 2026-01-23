@@ -4,12 +4,19 @@ export const batch2 = [
         title: "Valid Anagram",
         difficulty: "EASY",
         tags: ["String", "HashTable", "Sorting"],
-        description: "Given two strings s and t, return true if t is an anagram of s, and false otherwise.",
-        constraints: "1 <= s.length, t.length <= 5 * 10^4",
+        description: "Given two strings \`s\` and \`t\`, return \`true\` if \`t\` is an **anagram** of \`s\`, and \`false\` otherwise.\n\nAn **Anagram** is a word or phrase formed by rearranging the letters of a different word or phrase, typically using all the original letters exactly once.",
+        constraints: "1 <= s.length, t.length <= 5 * 10^4\ns and t consist of lowercase English letters.",
         testCases: [
             { input: 'anagram\nnagaram', output: "true" },
             { input: 'rat\ncar', output: "false" }
         ],
+        examples: {
+            JAVASCRIPT: { input: 'anagram\nnagaram', output: "true", explanation: "" },
+            PYTHON: { input: 'anagram\nnagaram', output: "true", explanation: "" },
+            JAVA: { input: 'anagram\nnagaram', output: "true", explanation: "" },
+            CPP: { input: 'anagram\nnagaram', output: "true", explanation: "" },
+            GOLANG: { input: 'anagram\nnagaram', output: "true", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {string} s\n * @param {string} t\n * @return {boolean}\n */\nvar isAnagram = function(s, t) {\n    \n};`,
             PYTHON: `class Solution:\n    def isAnagram(self, s: str, t: str) -> bool:\n        pass`,
@@ -37,12 +44,20 @@ export const batch2 = [
         title: "Missing Number",
         difficulty: "EASY",
         tags: ["Array", "HashTable", "Math"],
-        description: "Given an array nums containing n distinct numbers in the range [0, n], return the only number in the range that is missing from the array.",
-        constraints: "n == nums.length\n1 <= n <= 10^4",
+        description: "Given an array \`nums\` containing \`n\` distinct numbers in the range \`[0, n]\`, return the only number in the range that is missing from the array.",
+        constraints: "n == nums.length\n1 <= n <= 10^4\n0 <= nums[i] <= n\nAll the numbers of nums are unique.",
         testCases: [
             { input: "3\n3 0 1", output: "2" },
-            { input: "2\n0 1", output: "2" }
+            { input: "2\n0 1", output: "2" },
+            { input: "9\n9 6 4 2 3 5 7 0 1", output: "8" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "3\n3 0 1", output: "2", explanation: "n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums." },
+            PYTHON: { input: "3\n3 0 1", output: "2", explanation: "n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums." },
+            JAVA: { input: "3\n3 0 1", output: "2", explanation: "n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums." },
+            CPP: { input: "3\n3 0 1", output: "2", explanation: "n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums." },
+            GOLANG: { input: "3\n3 0 1", output: "2", explanation: "n = 3 since there are 3 numbers, so all numbers are in the range [0,3]. 2 is the missing number in the range since it does not appear in nums." }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @return {number}\n */\nvar missingNumber = function(nums) {\n    \n};`,
             PYTHON: `class Solution:\n    def missingNumber(self, nums: List[int]) -> int:\n        pass`,
@@ -70,12 +85,20 @@ export const batch2 = [
         title: "Plus One",
         difficulty: "EASY",
         tags: ["Array", "Math"],
-        description: "You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's. Increment the large integer by one and return the resulting array of digits.",
-        constraints: "1 <= digits.length <= 100",
+        description: "You are given a large integer represented as an integer array \`digits\`, where each \`digits[i]\` is the \`ith\` digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading \`0\`'s.\n\nIncrement the large integer by one and return the resulting array of digits.",
+        constraints: "1 <= digits.length <= 100\n0 <= digits[i] <= 9\ndigits does not contain any leading 0's.",
         testCases: [
             { input: "3\n1 2 3", output: "[1,2,4]" },
-            { input: "1\n9", output: "[1,0]" }
+            { input: "1\n9", output: "[1,0]" },
+            { input: "4\n4 3 2 1", output: "[4,3,2,2]" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "3\n1 2 3", output: "[1,2,4]", explanation: "The array represents the integer 123.\nIncrementing by one gives 123 + 1 = 124.\nThus, the result should be [1,2,4]." },
+            PYTHON: { input: "3\n1 2 3", output: "[1,2,4]", explanation: "The array represents the integer 123.\nIncrementing by one gives 123 + 1 = 124.\nThus, the result should be [1,2,4]." },
+            JAVA: { input: "3\n1 2 3", output: "[1,2,4]", explanation: "The array represents the integer 123.\nIncrementing by one gives 123 + 1 = 124.\nThus, the result should be [1,2,4]." },
+            CPP: { input: "3\n1 2 3", output: "[1,2,4]", explanation: "The array represents the integer 123.\nIncrementing by one gives 123 + 1 = 124.\nThus, the result should be [1,2,4]." },
+            GOLANG: { input: "3\n1 2 3", output: "[1,2,4]", explanation: "The array represents the integer 123.\nIncrementing by one gives 123 + 1 = 124.\nThus, the result should be [1,2,4]." }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} digits\n * @return {number[]}\n */\nvar plusOne = function(digits) {\n    \n};`,
             PYTHON: `class Solution:\n    def plusOne(self, digits: List[int]) -> List[int]:\n        pass`,
@@ -103,12 +126,19 @@ export const batch2 = [
         title: "Valid Perfect Square",
         difficulty: "EASY",
         tags: ["Math", "Binary Search"],
-        description: "Given a positive integer num, return true if num is a perfect square or false otherwise.",
+        description: "Given a positive integer \`num\`, return \`true\` if \`num\` is a perfect square or \`false\` otherwise.\n\nA **perfect square** is an integer that is the square of an integer. In other words, it is the product of some integer with itself.\n\nYou must not use any built-in library function, such as \`sqrt\`.",
         constraints: "1 <= num <= 2^31 - 1",
         testCases: [
             { input: "16", output: "true" },
             { input: "14", output: "false" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "16", output: "true", explanation: "We return true because 4 * 4 = 16 and 4 is an integer." },
+            PYTHON: { input: "16", output: "true", explanation: "We return true because 4 * 4 = 16 and 4 is an integer." },
+            JAVA: { input: "16", output: "true", explanation: "We return true because 4 * 4 = 16 and 4 is an integer." },
+            CPP: { input: "16", output: "true", explanation: "We return true because 4 * 4 = 16 and 4 is an integer." },
+            GOLANG: { input: "16", output: "true", explanation: "We return true because 4 * 4 = 16 and 4 is an integer." }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number} num\n * @return {boolean}\n */\nvar isPerfectSquare = function(num) {\n    \n};`,
             PYTHON: `class Solution:\n    def isPerfectSquare(self, num: int) -> bool:\n        pass`,
@@ -136,12 +166,20 @@ export const batch2 = [
         title: "Power of Two",
         difficulty: "EASY",
         tags: ["Math", "Bit Manipulation"],
-        description: "Given an integer n, return true if it is a power of two. Otherwise, return false.",
+        description: "Given an integer \`n\`, return \`true\` if it is a power of two. Otherwise, return \`false\`.\n\nAn integer \`n\` is a power of two, if there exists an integer \`x\` such that \`n == 2^x\`.",
         constraints: "-2^31 <= n <= 2^31 - 1",
         testCases: [
             { input: "1", output: "true" },
-            { input: "3", output: "false" }
+            { input: "3", output: "false" },
+            { input: "16", output: "true" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "1", output: "true", explanation: "2^0 = 1" },
+            PYTHON: { input: "1", output: "true", explanation: "2^0 = 1" },
+            JAVA: { input: "1", output: "true", explanation: "2^0 = 1" },
+            CPP: { input: "1", output: "true", explanation: "2^0 = 1" },
+            GOLANG: { input: "1", output: "true", explanation: "2^0 = 1" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number} n\n * @return {boolean}\n */\nvar isPowerOfTwo = function(n) {\n    \n};`,
             PYTHON: `class Solution:\n    def isPowerOfTwo(self, n: int) -> bool:\n        pass`,

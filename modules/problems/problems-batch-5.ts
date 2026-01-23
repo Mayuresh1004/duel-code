@@ -4,12 +4,20 @@ export const batch5 = [
         title: "Length of Last Word",
         difficulty: "EASY",
         tags: ["String"],
-        description: "Given a string s consisting of words and spaces, return the length of the last word in the string.",
-        constraints: "1 <= s.length <= 10^4",
+        description: "Given a string \`s\` consisting of words and spaces, return the length of the **last** word in the string.",
+        constraints: "1 <= s.length <= 10^4\ns consists of only English letters and spaces ' '.\nThere will be at least one word in s.",
         testCases: [
             { input: "Hello World", output: "5" },
-            { input: "   fly me   to   the moon  ", output: "4" }
+            { input: "   fly me   to   the moon  ", output: "4" },
+            { input: "luffy is still joyboy", output: "6" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "Hello World", output: "5", explanation: "The last word is \"World\" with length 5." },
+            PYTHON: { input: "Hello World", output: "5", explanation: "The last word is \"World\" with length 5." },
+            JAVA: { input: "Hello World", output: "5", explanation: "The last word is \"World\" with length 5." },
+            CPP: { input: "Hello World", output: "5", explanation: "The last word is \"World\" with length 5." },
+            GOLANG: { input: "Hello World", output: "5", explanation: "The last word is \"World\" with length 5." }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {string} s\n * @return {number}\n */\nvar lengthOfLastWord = function(s) {\n    \n};`,
             PYTHON: `class Solution:\n    def lengthOfLastWord(self, s: str) -> int:\n        pass`,
@@ -37,12 +45,20 @@ export const batch5 = [
         title: "Merge Sorted Array",
         difficulty: "EASY",
         tags: ["Array", "Two Pointers", "Sorting"],
-        description: "You are given two integer arrays nums1 and nums2, sorted in non-decreasing order, and two integers m and n, representing the number of elements in nums1 and nums2 respectively. Merge nums1 and nums2 into a single array sorted in non-decreasing order.",
-        constraints: "nums1.length == m + n\nnums2.length == n",
+        description: "You are given two integer arrays \`nums1\` and \`nums2\`, sorted in **non-decreasing order**, and two integers \`m\` and \`n\`, representing the number of elements in \`nums1\` and \`nums2\` respectively.\n\nMerge \`nums1\` and \`nums2\` into a single array sorted in **non-decreasing order**.",
+        constraints: "nums1.length == m + n\nnums2.length == n\n0 <= m, n <= 200\n1 <= m + n <= 200\n-10^9 <= nums1[i], nums2[j] <= 10^9",
         testCases: [
             { input: "6\n3\n3\n1 2 3 0 0 0\n2 5 6", output: "[1,2,2,3,5,6]" },
-            { input: "1\n1\n0\n1\n", output: "[1]" }
+            { input: "1\n1\n0\n1\n", output: "[1]" },
+            { input: "1\n0\n1\n0\n1", output: "[1]" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "6\n3\n3\n1 2 3 0 0 0\n2 5 6", output: "[1,2,2,3,5,6]", explanation: "The arrays we are merging are [1,2,3] and [2,5,6].\nThe result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1." },
+            PYTHON: { input: "6\n3\n3\n1 2 3 0 0 0\n2 5 6", output: "[1,2,2,3,5,6]", explanation: "The arrays we are merging are [1,2,3] and [2,5,6].\nThe result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1." },
+            JAVA: { input: "6\n3\n3\n1 2 3 0 0 0\n2 5 6", output: "[1,2,2,3,5,6]", explanation: "The arrays we are merging are [1,2,3] and [2,5,6].\nThe result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1." },
+            CPP: { input: "6\n3\n3\n1 2 3 0 0 0\n2 5 6", output: "[1,2,2,3,5,6]", explanation: "The arrays we are merging are [1,2,3] and [2,5,6].\nThe result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1." },
+            GOLANG: { input: "6\n3\n3\n1 2 3 0 0 0\n2 5 6", output: "[1,2,2,3,5,6]", explanation: "The arrays we are merging are [1,2,3] and [2,5,6].\nThe result of the merge is [1,2,2,3,5,6] with the underlined elements coming from nums1." }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums1\n * @param {number} m\n * @param {number[]} nums2\n * @param {number} n\n * @return {void} Do not return anything, modify nums1 in-place instead.\n */\nvar merge = function(nums1, m, nums2, n) {\n    \n};`,
             PYTHON: `class Solution:\n    def merge(self, nums1: List[int], m: int, nums2: List[int], n: int) -> None:\n        """\n        Do not return anything, modify nums1 in-place instead.\n        """\n        pass`,
@@ -70,12 +86,20 @@ export const batch5 = [
         title: "Excel Sheet Column Number",
         difficulty: "EASY",
         tags: ["Math", "String"],
-        description: "Given a string columnTitle that represents the column title as appears in an Excel sheet, return its corresponding column number.",
-        constraints: "1 <= columnTitle.length <= 7",
+        description: "Given a string \`columnTitle\` that represents the column title as appears in an Excel sheet, return its corresponding column number.",
+        constraints: "1 <= columnTitle.length <= 7\ncolumnTitle consists only of uppercase English letters.\ncolumnTitle is in the range [\"A\", \"FXSHRXW\"].",
         testCases: [
             { input: "A", output: "1" },
-            { input: "AB", output: "28" }
+            { input: "AB", output: "28" },
+            { input: "ZY", output: "701" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "AB", output: "28", explanation: "" },
+            PYTHON: { input: "AB", output: "28", explanation: "" },
+            JAVA: { input: "AB", output: "28", explanation: "" },
+            CPP: { input: "AB", output: "28", explanation: "" },
+            GOLANG: { input: "AB", output: "28", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {string} columnTitle\n * @return {number}\n */\nvar titleToNumber = function(columnTitle) {\n    \n};`,
             PYTHON: `class Solution:\n    def titleToNumber(self, columnTitle: str) -> int:\n        pass`,
@@ -103,12 +127,19 @@ export const batch5 = [
         title: "Happy Number",
         difficulty: "EASY",
         tags: ["HashTable", "Math", "Two Pointers"],
-        description: "Write an algorithm to determine if a number n is happy.",
+        description: "Write an algorithm to determine if a number \`n\` is happy.\n\nA **happy number** is a number defined by the following process:\n\n1. Starting with any positive integer, replace the number by the sum of the squares of its digits.\n2. Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1.\n3. Those numbers for which this process ends in 1 are happy.\n\nReturn \`true\` if \`n\` is a happy number, and \`false\` if not.",
         constraints: "1 <= n <= 2^31 - 1",
         testCases: [
             { input: "19", output: "true" },
             { input: "2", output: "false" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "19", output: "true", explanation: "1^2 + 9^2 = 82\n8^2 + 2^2 = 68\n6^2 + 8^2 = 100\n1^2 + 0^2 + 0^2 = 1" },
+            PYTHON: { input: "19", output: "true", explanation: "1^2 + 9^2 = 82\n8^2 + 2^2 = 68\n6^2 + 8^2 = 100\n1^2 + 0^2 + 0^2 = 1" },
+            JAVA: { input: "19", output: "true", explanation: "1^2 + 9^2 = 82\n8^2 + 2^2 = 68\n6^2 + 8^2 = 100\n1^2 + 0^2 + 0^2 = 1" },
+            CPP: { input: "19", output: "true", explanation: "1^2 + 9^2 = 82\n8^2 + 2^2 = 68\n6^2 + 8^2 = 100\n1^2 + 0^2 + 0^2 = 1" },
+            GOLANG: { input: "19", output: "true", explanation: "1^2 + 9^2 = 82\n8^2 + 2^2 = 68\n6^2 + 8^2 = 100\n1^2 + 0^2 + 0^2 = 1" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number} n\n * @return {boolean}\n */\nvar isHappy = function(n) {\n    \n};`,
             PYTHON: `class Solution:\n    def isHappy(self, n: int) -> bool:\n        pass`,
@@ -136,12 +167,20 @@ export const batch5 = [
         title: "Isomorphic Strings",
         difficulty: "EASY",
         tags: ["HashTable", "String"],
-        description: "Given two strings s and t, determine if they are isomorphic.",
-        constraints: "1 <= s.length <= 5 * 10^4",
+        description: "Given two strings \`s\` and \`t\`, determine if they are isomorphic.\n\nTwo strings \`s\` and \`t\` are isomorphic if the characters in \`s\` can be replaced to get \`t\`.",
+        constraints: "1 <= s.length <= 5 * 10^4\nt.length == s.length\ns and t consist of any valid ascii character.",
         testCases: [
             { input: "egg\nadd", output: "true" },
-            { input: "foo\nbar", output: "false" }
+            { input: "foo\nbar", output: "false" },
+            { input: "paper\ntitle", output: "true" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "egg\nadd", output: "true", explanation: "" },
+            PYTHON: { input: "egg\nadd", output: "true", explanation: "" },
+            JAVA: { input: "egg\nadd", output: "true", explanation: "" },
+            CPP: { input: "egg\nadd", output: "true", explanation: "" },
+            GOLANG: { input: "egg\nadd", output: "true", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {string} s\n * @param {string} t\n * @return {boolean}\n */\nvar isIsomorphic = function(s, t) {\n    \n};`,
             PYTHON: `class Solution:\n    def isIsomorphic(self, s: str, t: str) -> bool:\n        pass`,

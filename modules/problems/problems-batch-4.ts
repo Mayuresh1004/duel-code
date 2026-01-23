@@ -4,12 +4,19 @@ export const batch4 = [
         title: "Product of Array Except Self",
         difficulty: "MEDIUM",
         tags: ["Array", "Prefix Sum"],
-        description: "Given an integer array nums, return an array answer such that answer[i] is equal to the product of all the elements of nums except nums[i].",
-        constraints: "2 <= nums.length <= 10^5",
+        description: "Given an integer array \`nums\`, return an array \`answer\` such that \`answer[i]\` is equal to the product of all the elements of \`nums\` except \`nums[i]\`.\n\nThe product of any prefix or suffix of \`nums\` is **guaranteed** to fit in a **32-bit** integer.\n\nYou must write an algorithm that runs in \`O(n)\` time and without using the division operation.",
+        constraints: "2 <= nums.length <= 10^5\n-30 <= nums[i] <= 30",
         testCases: [
             { input: "4\n1 2 3 4", output: "[24,12,8,6]" },
             { input: "5\n-1 1 0 -3 3", output: "[0,0,9,0,0]" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "4\n1 2 3 4", output: "[24,12,8,6]", explanation: "" },
+            PYTHON: { input: "4\n1 2 3 4", output: "[24,12,8,6]", explanation: "" },
+            JAVA: { input: "4\n1 2 3 4", output: "[24,12,8,6]", explanation: "" },
+            CPP: { input: "4\n1 2 3 4", output: "[24,12,8,6]", explanation: "" },
+            GOLANG: { input: "4\n1 2 3 4", output: "[24,12,8,6]", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @return {number[]}\n */\nvar productExceptSelf = function(nums) {\n    \n};`,
             PYTHON: `class Solution:\n    def productExceptSelf(self, nums: List[int]) -> List[int]:\n        pass`,
@@ -37,12 +44,20 @@ export const batch4 = [
         title: "Maximum Subarray",
         difficulty: "MEDIUM",
         tags: ["Array", "Divide and Conquer", "Dynamic Programming"],
-        description: "Given an integer array nums, find the subarray with the largest sum, and return its sum.",
-        constraints: "1 <= nums.length <= 10^5",
+        description: "Given an integer array \`nums\`, find the subarray with the largest sum, and return its sum.",
+        constraints: "1 <= nums.length <= 10^5\n-10^4 <= nums[i] <= 10^4",
         testCases: [
             { input: "9\n-2 1 -3 4 -1 2 1 -5 4", output: "6" },
-            { input: "1\n1", output: "1" }
+            { input: "1\n1", output: "1" },
+            { input: "5\n5 4 -1 7 8", output: "23" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "9\n-2 1 -3 4 -1 2 1 -5 4", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." },
+            PYTHON: { input: "9\n-2 1 -3 4 -1 2 1 -5 4", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." },
+            JAVA: { input: "9\n-2 1 -3 4 -1 2 1 -5 4", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." },
+            CPP: { input: "9\n-2 1 -3 4 -1 2 1 -5 4", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." },
+            GOLANG: { input: "9\n-2 1 -3 4 -1 2 1 -5 4", output: "6", explanation: "The subarray [4,-1,2,1] has the largest sum 6." }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @return {number}\n */\nvar maxSubArray = function(nums) {\n    \n};`,
             PYTHON: `class Solution:\n    def maxSubArray(self, nums: List[int]) -> int:\n        pass`,
@@ -70,12 +85,19 @@ export const batch4 = [
         title: "Rotate Array",
         difficulty: "MEDIUM",
         tags: ["Array", "Math", "Two Pointers"],
-        description: "Given an integer array nums, rotate the array to the right by k steps, where k is non-negative.",
-        constraints: "1 <= nums.length <= 10^5",
+        description: "Given an integer array \`nums\`, rotate the array to the right by \`k\` steps, where \`k\` is non-negative.",
+        constraints: "1 <= nums.length <= 10^5\n-2^31 <= nums[i] <= 2^31 - 1\n0 <= k <= 10^5",
         testCases: [
             { input: "7\n1 2 3 4 5 6 7\n3", output: "[5,6,7,1,2,3,4]" },
             { input: "4\n-1 -100 3 99\n2", output: "[3,99,-1,-100]" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "7\n1 2 3 4 5 6 7\n3", output: "[5,6,7,1,2,3,4]", explanation: "rotate 1 steps to the right: [7,1,2,3,4,5,6]\nrotate 2 steps to the right: [6,7,1,2,3,4,5]\nrotate 3 steps to the right: [5,6,7,1,2,3,4]" },
+            PYTHON: { input: "7\n1 2 3 4 5 6 7\n3", output: "[5,6,7,1,2,3,4]", explanation: "rotate 1 steps to the right: [7,1,2,3,4,5,6]\nrotate 2 steps to the right: [6,7,1,2,3,4,5]\nrotate 3 steps to the right: [5,6,7,1,2,3,4]" },
+            JAVA: { input: "7\n1 2 3 4 5 6 7\n3", output: "[5,6,7,1,2,3,4]", explanation: "rotate 1 steps to the right: [7,1,2,3,4,5,6]\nrotate 2 steps to the right: [6,7,1,2,3,4,5]\nrotate 3 steps to the right: [5,6,7,1,2,3,4]" },
+            CPP: { input: "7\n1 2 3 4 5 6 7\n3", output: "[5,6,7,1,2,3,4]", explanation: "rotate 1 steps to the right: [7,1,2,3,4,5,6]\nrotate 2 steps to the right: [6,7,1,2,3,4,5]\nrotate 3 steps to the right: [5,6,7,1,2,3,4]" },
+            GOLANG: { input: "7\n1 2 3 4 5 6 7\n3", output: "[5,6,7,1,2,3,4]", explanation: "rotate 1 steps to the right: [7,1,2,3,4,5,6]\nrotate 2 steps to the right: [6,7,1,2,3,4,5]\nrotate 3 steps to the right: [5,6,7,1,2,3,4]" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @param {number} k\n * @return {void} Do not return anything, modify nums in-place instead.\n */\nvar rotate = function(nums, k) {\n    \n};`,
             PYTHON: `class Solution:\n    def rotate(self, nums: List[int], k: int) -> None:\n        """\n        Do not return anything, modify nums in-place instead.\n        """\n        pass`,
@@ -103,12 +125,20 @@ export const batch4 = [
         title: "Search in Rotated Sorted Array",
         difficulty: "MEDIUM",
         tags: ["Array", "Binary Search"],
-        description: "There is an integer array nums sorted in ascending order (with distinct values). Prior to being passed to your function, nums is possibly rotated at an unknown pivot index k. Given the array nums after the possible rotation and an integer target, return the index of target if it is in nums, or -1 if it is not in nums.",
-        constraints: "1 <= nums.length <= 5000",
+        description: "There is an integer array \`nums\` sorted in ascending order (with **distinct** values).\n\nPrior to being passed to your function, \`nums\` is possibly rotated at an unknown pivot index \`k\`. Given the array \`nums\` after the possible rotation and an integer \`target\`, return the index of \`target\` if it is in \`nums\`, or \`-1\` if it is not in \`nums\`.",
+        constraints: "1 <= nums.length <= 5000\n-10^4 <= nums[i] <= 10^4\nAll values of nums are unique.\nnums is an ascending array that is possibly rotated.\n-10^4 <= target <= 10^4",
         testCases: [
             { input: "7\n4 5 6 7 0 1 2\n0", output: "4" },
-            { input: "7\n4 5 6 7 0 1 2\n3", output: "-1" }
+            { input: "7\n4 5 6 7 0 1 2\n3", output: "-1" },
+            { input: "1\n1\n0", output: "-1" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "7\n4 5 6 7 0 1 2\n0", output: "4", explanation: "" },
+            PYTHON: { input: "7\n4 5 6 7 0 1 2\n0", output: "4", explanation: "" },
+            JAVA: { input: "7\n4 5 6 7 0 1 2\n0", output: "4", explanation: "" },
+            CPP: { input: "7\n4 5 6 7 0 1 2\n0", output: "4", explanation: "" },
+            GOLANG: { input: "7\n4 5 6 7 0 1 2\n0", output: "4", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar search = function(nums, target) {\n    \n};`,
             PYTHON: `class Solution:\n    def search(self, nums: List[int], target: int) -> int:\n        pass`,
@@ -137,11 +167,19 @@ export const batch4 = [
         difficulty: "EASY",
         tags: ["Array", "Binary Search"],
         description: "Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.",
-        constraints: "1 <= nums.length <= 10^4",
+        constraints: "1 <= nums.length <= 10^4\n-10^4 <= nums[i] <= 10^4\nnums contains distinct values sorted in ascending order.\n-10^4 <= target <= 10^4",
         testCases: [
             { input: "4\n1 3 5 6\n5", output: "2" },
-            { input: "4\n1 3 5 6\n2", output: "1" }
+            { input: "4\n1 3 5 6\n2", output: "1" },
+            { input: "4\n1 3 5 6\n7", output: "4" }
         ],
+        examples: {
+            JAVASCRIPT: { input: "4\n1 3 5 6\n5", output: "2", explanation: "" },
+            PYTHON: { input: "4\n1 3 5 6\n5", output: "2", explanation: "" },
+            JAVA: { input: "4\n1 3 5 6\n5", output: "2", explanation: "" },
+            CPP: { input: "4\n1 3 5 6\n5", output: "2", explanation: "" },
+            GOLANG: { input: "4\n1 3 5 6\n5", output: "2", explanation: "" }
+        },
         codeSnippets: {
             JAVASCRIPT: `/**\n * @param {number[]} nums\n * @param {number} target\n * @return {number}\n */\nvar searchInsert = function(nums, target) {\n    \n};`,
             PYTHON: `class Solution:\n    def searchInsert(self, nums: List[int], target: int) -> int:\n        pass`,

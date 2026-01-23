@@ -2,6 +2,11 @@
 import { batch1 } from "./problems-batch-1";
 import { batch2 } from "./problems-batch-2";
 import { batch3 } from "./problems-batch-3";
+import { batch4 } from "./problems-batch-4";
+import { batch5 } from "./problems-batch-5";
+import { batch6 } from "./problems-batch-6";
+import { batch7 } from "./problems-batch-7";
+import { batch8 } from "./problems-batch-8";
 
 export const problems = {
   ARRAY: [
@@ -16,6 +21,13 @@ export const problems = {
         { input: "4\n2 7 11 15\n9", output: "[0,1]" },
         { input: "3\n3 2 4\n6", output: "[1,2]" }
       ],
+      examples: {
+        JAVASCRIPT: { input: "4\n2 7 11 15\n9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, we return [0, 1]." },
+        PYTHON: { input: "4\n2 7 11 15\n9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, return [0, 1]." },
+        JAVA: { input: "4\n2 7 11 15\n9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, return [0, 1]." },
+        CPP: { input: "4\n2 7 11 15\n9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, return [0, 1]." },
+        GOLANG: { input: "4\n2 7 11 15\n9", output: "[0,1]", explanation: "Because nums[0] + nums[1] == 9, return [0, 1]." }
+      },
       codeSnippets: {
         JAVASCRIPT: `function twoSum(nums, target) {\n  // Write your code here\n}`,
         PYTHON: `from typing import List\n\nclass Solution:\n    def twoSum(self, nums: List[int], target: int) -> List[int]:\n        pass`,
@@ -80,12 +92,20 @@ export const problems = {
       title: "Valid Palindrome",
       difficulty: "EASY",
       tags: ["String", "Two Pointers"],
-      description: "Return true if the phrase is a palindrome after removing non-alphanumeric characters and converting to lowercase.",
-      constraints: "1 <= s.length <= 2 * 10^5",
+      description: "A phrase is a **palindrome** if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.\n\nGiven a string \`s\`, return \`true\` if it is a **palindrome**, or \`false\` otherwise.",
+      constraints: "1 <= s.length <= 2 * 10^5\ns consists only of printable ASCII characters.",
       testCases: [
         { input: "A man, a plan, a canal: Panama", output: "true" },
-        { input: "race a car", output: "false" }
+        { input: "race a car", output: "false" },
+        { input: " ", output: "true" }
       ],
+      examples: {
+        JAVASCRIPT: { input: "A man, a plan, a canal: Panama", output: "true", explanation: '"amanaplanacanalpanama" is a palindrome.' },
+        PYTHON: { input: "A man, a plan, a canal: Panama", output: "true", explanation: '"amanaplanacanalpanama" is a palindrome.' },
+        JAVA: { input: "A man, a plan, a canal: Panama", output: "true", explanation: '"amanaplanacanalpanama" is a palindrome.' },
+        CPP: { input: "A man, a plan, a canal: Panama", output: "true", explanation: '"amanaplanacanalpanama" is a palindrome.' },
+        GOLANG: { input: "A man, a plan, a canal: Panama", output: "true", explanation: '"amanaplanacanalpanama" is a palindrome.' }
+      },
       codeSnippets: {
         JAVASCRIPT: `function isPalindrome(s) {\n  \n}`,
         PYTHON: `class Solution:\n    def isPalindrome(self, s: str) -> bool:\n        pass`,
@@ -109,12 +129,19 @@ export const problems = {
       title: "Climbing Stairs",
       difficulty: "EASY",
       tags: ["Dynamic Programming", "Math"],
-      description: "How many distinct ways can you climb to the top of a staircase with n steps if you take 1 or 2 steps each time?",
+      description: "You are climbing a staircase. It takes \`n\` steps to reach the top.\n\nEach time you can either climb \`1\` or \`2\` steps. In how many distinct ways can you climb to the top?",
       constraints: "1 <= n <= 45",
       testCases: [
         { input: "2", output: "2" },
         { input: "3", output: "3" }
       ],
+      examples: {
+        JAVASCRIPT: { input: "2", output: "2", explanation: "There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps" },
+        PYTHON: { input: "2", output: "2", explanation: "There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps" },
+        JAVA: { input: "2", output: "2", explanation: "There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps" },
+        CPP: { input: "2", output: "2", explanation: "There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps" },
+        GOLANG: { input: "2", output: "2", explanation: "There are two ways to climb to the top.\n1. 1 step + 1 step\n2. 2 steps" }
+      },
       codeSnippets: {
         JAVASCRIPT: `function climbStairs(n) {\n  \n}`,
         PYTHON: `class Solution:\n    def climbStairs(self, n: int) -> int:\n        pass`,
@@ -131,5 +158,14 @@ export const problems = {
       }
     }
   ],
-  PRACTICE: [...batch1, ...batch2, ...batch3]
+  PRACTICE: [
+    ...batch1,
+    ...batch2,
+    ...batch3,
+    ...batch4,
+    ...batch5,
+    ...batch6,
+    ...batch7,
+    ...batch8
+  ]
 } as const;
