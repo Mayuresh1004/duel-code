@@ -697,6 +697,32 @@ export const submitCode = async (
     };
 }
 
+
+export const getAllSubmissionByUser = async (problemId) => {
+    const user = await currentUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const userId = await db.user.findUnique({
+        where: { clerkId: user.id },
+        select: { id: true }
+    })
+
+    const submissions = await db.submissions.findMany({
+        where: {
+            userId: userId?.id,
+            problemId: problemId
+        },
+        orderBy: {
+            createdAt: "desc"
+        },
+        include: {
+            testCases: true
+        }
+    })
+
+    return { success: true, data: submissions }
+}
+
 // Keeping a simple alias for backward compatibility or clarity if needed, 
 // strictly speaking executeCode was the old name. 
 export const executeCode = runCode;

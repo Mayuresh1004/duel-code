@@ -39,7 +39,7 @@ import { getJudge0LanguageId } from "@/lib/judge0";
 import { toast } from "sonner";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { executeCode, getProblembyId, submitCode } from "@/modules/problems/actions";
+import { executeCode, getAllSubmissionByUser, getProblembyId, submitCode } from "@/modules/problems/actions";
 import { SubmissionDetails } from "@/modules/problems/components/submission-details";
 import { TestCaseTable } from "@/modules/problems/components/test-case-table";
 // import { SubmissionDetails } from "@/modules/problems/components/submission-details";
@@ -143,6 +143,24 @@ const ProblemIdPage = () => {
       setIsRunning(false);
     }
   };
+
+      useEffect(()=>{
+    const fetchSubmissionHistory = async()=>{
+      try {
+        const resolvedParams =  params;
+        const submissionHistory = await getAllSubmissionByUser(resolvedParams.id);
+        console.log(submissionHistory);
+        if (submissionHistory.success) {
+          setSubmissionHistory(submissionHistory.data);
+        }
+      } catch (error) {
+        console.error('Error fetching problem:', error);
+      }
+    }
+
+    fetchSubmissionHistory();
+  },[params])  
+
 
   const handleSubmit = async () => {
     try {
