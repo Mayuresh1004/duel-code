@@ -724,5 +724,4 @@ export const getAllSubmissionByUser = async (problemId) => {
 }
 
 // Keeping a simple alias for backward compatibility or clarity if needed, 
-// strictly speaking executeCode was the old name. 
 export const executeCode = runCode;
