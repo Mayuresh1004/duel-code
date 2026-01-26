@@ -723,6 +723,8 @@ export const getAllSubmissionByUser = async (problemId) => {
         }
     })
 
+    // revalidatePath(`/problem/${problemId}`);
+
     console.log("History Fetched");
     
 
