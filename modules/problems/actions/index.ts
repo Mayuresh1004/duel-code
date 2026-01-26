@@ -702,6 +702,9 @@ export const getAllSubmissionByUser = async (problemId) => {
     const user = await currentUser();
     if (!user) return { success: false, error: "Unauthorized" };
 
+    console.log("Fetching History");
+    
+
     const userId = await db.user.findUnique({
         where: { clerkId: user.id },
         select: { id: true }
@@ -719,6 +722,9 @@ export const getAllSubmissionByUser = async (problemId) => {
             testCases: true
         }
     })
+
+    console.log("History Fetched");
+    
 
     return { success: true, data: submissions }
 }

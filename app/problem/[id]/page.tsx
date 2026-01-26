@@ -42,6 +42,7 @@ import { useParams } from "next/navigation";
 import { executeCode, getAllSubmissionByUser, getProblembyId, submitCode } from "@/modules/problems/actions";
 import { SubmissionDetails } from "@/modules/problems/components/submission-details";
 import { TestCaseTable } from "@/modules/problems/components/test-case-table";
+import { SubmissionHistory } from "@/modules/problems/components/submission-history";
 // import { SubmissionDetails } from "@/modules/problems/components/submission-details";
 // import { TestCaseTable } from "@/modules/problems/components/test-case-table";
 // import { SubmissionHistory } from "@/modules/problems/components/submission-history";
@@ -313,8 +314,7 @@ const ProblemIdPage = () => {
                   </TabsList>
                   <TabsContent value="submissions" className="p-6">
                     <div className="text-center py-8 text-muted-foreground">
-                      <p>Submission History</p>
-                      {/* <SubmissionHistory submissions={submissionHistory} /> */}
+                      <SubmissionHistory submissions={submissionHistory} />
                     </div>
                   </TabsContent>
                   <TabsContent value="editorial" className="p-6">
