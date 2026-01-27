@@ -25,11 +25,11 @@ export function NavbarHome({userRole}:any) {
     },
     {
       name: "About",
-      link: "#about",
+      link: "/about",
     },
     {
       name: "Profile",
-      link: "#profle",
+      link: "/profile",
     },
   ];
 

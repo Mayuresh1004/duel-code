@@ -6,6 +6,8 @@ import { Highlighter } from "@/components/ui/highlighter";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Code2, Play, Trophy, Users, Zap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { navigate } from "next/dist/client/components/segment-cache/navigation";
+import Link from "next/link";
 
 export default async function Home() {
 
@@ -73,7 +75,9 @@ export default async function Home() {
         <div className="gap-4 mb-15">
         <Button variant={"default"} color="#1d73e5" className="mr-4 w-[250px] bg-[#1d73e5] text-neutral-200 " > <Play className="mb-0.5"/> <span className="mb-1">Start Coding Now</span> <ChevronRight className="mb-0.5"/> </Button>
 
+        <Link href="/problems">
         <Button variant={"secondary"} color="#1d73e5" className="hover:border-2 border-[#1d73e5] transition-all duration-100 " >Browse Problems</Button>
+        </Link>
         </div>
 
         
