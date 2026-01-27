@@ -22,7 +22,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode }) => {
       <div className="pointer-events-none absolute inset-0 bg-white [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)] dark:bg-black" />
 
       {/* Page layout */}
-      <div className="relative z-20 flex min-h-screen flex-col">
+      <div className="relative z-10 flex min-h-screen flex-col">
         {/* Navbar */}
         <NavbarHome userRole={userRole} />
 

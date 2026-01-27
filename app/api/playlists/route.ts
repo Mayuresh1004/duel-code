@@ -1,7 +1,6 @@
 import db from "@/lib/db";
 import { currentUser } from "@clerk/nextjs/server";
-import { NextRequest } from "next/server";
-import { da } from "zod/v4/locales";
+import { NextRequest, NextResponse } from "next/server";
 
 
 export async function POST(request: NextRequest) {
@@ -33,12 +32,11 @@ export async function POST(request: NextRequest) {
         const newPlaylist = await db.playlist.create({
             data:{
                 name,
-                description,
+                description : description || null,
                 userId: dbUser.id,
             }
         })
-        return new Response(JSON.stringify(newPlaylist), { status: 201 })
-
+        return NextResponse.json(newPlaylist, { status: 201 });
     } catch (error) {
 
         console.error("Error creating playlist:", error);
@@ -47,7 +45,7 @@ export async function POST(request: NextRequest) {
     }
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         const user = await currentUser()
         if(!user) {
@@ -80,10 +78,10 @@ export async function GET(request: NextRequest) {
                     
                 }
             },
-            orderby: { createdAt: 'desc' }
+            orderBy: { createdAt: 'desc' }
         })
 
-        return new Response(JSON.stringify(playlists), { status: 200 })
+        return NextResponse.json(playlists, { status: 200 })
     } catch (error) {
         console.error("Error fetching playlists:", error);
         return new Response("Internal Server Error", { status: 500 })
