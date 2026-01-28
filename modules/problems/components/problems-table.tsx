@@ -313,9 +313,11 @@ export const ProblemsTable = ({ problems, user }) => {
                               >
                                 <TrashIcon className="h-4 w-4" />
                               </Button>
-                              <Button variant="outline" size="sm" disabled>
+                              <Link href={`/update-problem/${problem.id}`}>
+                              <Button variant="outline" size="sm">
                                 <PencilIcon className="h-4 w-4" />
                               </Button>
+                              </Link>
                             </>
                           )}
                           <Button

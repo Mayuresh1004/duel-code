@@ -122,3 +122,28 @@ export const getCurrentUser = async () => {
 
         return dbUser?.id
 }
+
+export const getCurrentProblem = async (problemId:string) => {
+    const user = await currentUser()
+    
+
+    if(!user){
+            return {
+                success:false,
+                error: "No Authenticated User Found"
+            }
+        }
+
+
+        const dbProblem = await db.problem.findUnique({
+            where:{
+                id: problemId
+            },
+            select:{
+                id: true
+            }
+
+        }) 
+
+        return dbProblem?.id
+}
