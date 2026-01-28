@@ -12,8 +12,9 @@ import {
   BookOpen,
   CheckCircle2,
   Download,
+  PencilIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -302,26 +303,35 @@ func main() {
       return;
     }
 
-    const data = await res.json();
+    const json = await res.json();
+
+    if (!json.success) {
+      toast.error("Problem not found");
+      return;
+    }
+
+    const problem = json.data; // ✅ THIS WAS MISSING
+
+    
 
     reset({
-      title: data.title,
-      description: data.description,
-      difficulty: data.difficulty,
-      tags: data.tags,
-      constraints: data.constraints,
-      hints: data.hints,
-      editorial: data.editorial,
-      testCases: data.testCases,
-      examples: data.examples,
-      codeSnippets: data.codeSnippets,
-      referenceSolutions: data.referenceSolution,
-      driverCode: data.driverCode,
+      title: problem.title,
+      tags: problem.tags,
+      testCases: problem.testCases,
+      description: problem.description,
+      difficulty: problem.difficulty,
+      constraints: problem.constraints,
+      hints: problem.hints ?? "",
+      editorial: problem.editorial ?? "",
+      examples: problem.examples,
+      codeSnippets: problem.codeSnippets,
+      referenceSolutions: problem.referenceSolution, // Prisma name
+      driverCode: problem.driverCode ?? {},
     });
   };
 
   loadProblem();
-}, [problemId, reset]);
+}, [problemId]);
 
 
     const onSubmit = async(values:any)=>{
@@ -387,7 +397,7 @@ func main() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <CardTitle className="text-3xl flex items-center gap-3">
               <FileText className="w-8 h-8 text-amber-600" />
-              Create Problem
+              Update Problem
             </CardTitle>
 
             <div className="flex flex-col items-center justify-center md:flex-row gap-3">
@@ -893,12 +903,12 @@ func main() {
                 {isLoading ? (
                   <>
                     <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Creating...
+                    Updating...
                   </>
                 ) : (
                   <>
-                    <Plus className="w-5 h-5" />
-                    Create Problem
+                    <PencilIcon className="w-5 h-5" />
+                    Update Problem
                   </>
                 )}
               </Button>
