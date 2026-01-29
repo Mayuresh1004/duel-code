@@ -21,8 +21,12 @@ RUN npm install -g pnpm && pnpm prisma generate
 # Build Next.js
 # Note: Ensure all required environment variables for building are provided (or use a .env.production)
 ENV NEXT_TELEMETRY_DISABLED 1
-ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_placeholder
-ENV CLERK_SECRET_KEY=sk_test_placeholder
+
+ARG NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ARG CLERK_SECRET_KEY
+
+ENV NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+ENV CLERK_SECRET_KEY=$CLERK_SECRET_KEY
 RUN pnpm build
 
 # Stage 3: Production runner
