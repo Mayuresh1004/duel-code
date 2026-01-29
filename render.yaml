@@ -1,0 +1,69 @@
+services:
+  # Judge0 Web Service
+  - type: web
+    name: judge0-server
+    runtime: docker
+    image: judge0/judge0:1.13.0
+    plan: starter
+    envVars:
+      - key: REDIS_HOST
+        fromService:
+          type: pserv
+          name: judge0-redis
+          property: host
+      - key: REDIS_PORT
+        value: 6379
+      - key: REDIS_PASSWORD
+        sync: false
+      - key: POSTGRES_HOST
+        fromService:
+          type: pserv
+          name: judge0-db
+          property: host
+      - key: POSTGRES_PORT
+        value: 5432
+      - key: POSTGRES_DB
+        value: judge0
+      - key: POSTGRES_USER
+        value: judge0
+      - key: POSTGRES_PASSWORD
+        sync: false
+      - key: AUTH_TOKEN
+        sync: false
+      - key: JUDGE0_API_URL
+        value: http://0.0.0.0:2358 
+    dockerCommand: ./scripts/start.sh
+    healthCheckPath: /health
+    disk:
+      name: judge0-data
+      mountPath: /var/lib/judge0
+      sizeGB: 10
+
+  # Redis Private Service
+  - type: pserv
+    name: judge0-redis
+    runtime: docker
+    image: redis:7-alpine
+    plan: starter
+    envVars:
+      - key: REDIS_PASSWORD
+        sync: false
+    dockerCommand: redis-server --requirepass $REDIS_PASSWORD
+
+  # Postgres Private Service
+  - type: pserv
+    name: judge0-db
+    runtime: docker
+    image: postgres:15-alpine
+    plan: starter
+    envVars:
+      - key: POSTGRES_DB
+        value: judge0
+      - key: POSTGRES_USER
+        value: judge0
+      - key: POSTGRES_PASSWORD
+        sync: false
+    disk:
+      name: judge0-pg-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 10
