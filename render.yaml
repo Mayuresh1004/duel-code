@@ -2,8 +2,8 @@ services:
   # Judge0 Web Service
   - type: web
     name: judge0-server
-    runtime: docker
-    image: judge0/judge0:1.13.0
+    env: docker
+    dockerfilePath: ./Dockerfile.judge0
     plan: starter
     envVars:
       - key: REDIS_HOST
@@ -42,8 +42,8 @@ services:
   # Redis Private Service
   - type: pserv
     name: judge0-redis
-    runtime: docker
-    image: redis:7-alpine
+    env: docker
+    dockerfilePath: ./Dockerfile.redis
     plan: starter
     envVars:
       - key: REDIS_PASSWORD
@@ -53,8 +53,8 @@ services:
   # Postgres Private Service
   - type: pserv
     name: judge0-db
-    runtime: docker
-    image: postgres:15-alpine
+    env: docker
+    dockerfilePath: ./Dockerfile.postgres
     plan: starter
     envVars:
       - key: POSTGRES_DB
