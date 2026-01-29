@@ -1,39 +1,70 @@
 version: '3.8'
 
 services:
-  judge0:
-    image: judge0/judge0:latest
+  judge0-server:
+    image: judge0/judge0:1.13.0
     volumes:
       - ./judge0.conf:/judge0.conf:ro
     ports:
       - "2358:2358"
     privileged: true
     environment:
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
+      - REDIS_HOST=${REDIS_HOST:-redis}
+      - REDIS_PORT=${REDIS_PORT:-6379}
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - POSTGRES_HOST=db
-      - POSTGRES_DB=judge0
-      - POSTGRES_USER=judge0
+      - POSTGRES_HOST=${POSTGRES_HOST:-postgres}
+      - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+      - POSTGRES_DB=${POSTGRES_DB:-judge0}
+      - POSTGRES_USER=${POSTGRES_USER:-judge0}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ENABLE_WAIT_RESULT=true
+      - ENABLE_COMPILER_OPTIONS=true
+      - ALLOWED_LANGUAGES_FOR_COMPILE_OPTIONS=44,45,46,47,48,49,50,51,52,53,54
+      - MAX_QUEUE_SIZE=500
+      - MAX_CPU_TIME_LIMIT=15
+      - MAX_WALL_TIME_LIMIT=20
+      - MAX_MEMORY_LIMIT=512000
+      - MAX_STACK_LIMIT=256000
+      - MAX_PROCESSES_AND_OR_THREADS=120
+      - MAX_NUMBER_OF_RUNS=20
+      - MAX_FILE_SIZE=10240
+      - ENABLE_PER_PROCESS_AND_THREAD_MEMORY_LIMIT=true
+      - ENABLE_PER_PROCESS_AND_THREAD_TIME_LIMIT=true
     restart: always
+    depends_on:
+      - redis
+      - postgres
 
   redis:
-    image: redis:alpine
+    image: redis:7-alpine
     command: redis-server --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis-data:/data
+    ports:
+      - "6379:6379"
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  db:
-    image: postgres:13-alpine
+  postgres:
+    image: postgres:15-alpine
     environment:
-      POSTGRES_DB: judge0
-      POSTGRES_USER: judge0
+      POSTGRES_DB: ${POSTGRES_DB:-judge0}
+      POSTGRES_USER: ${POSTGRES_USER:-judge0}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U judge0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   redis-data:

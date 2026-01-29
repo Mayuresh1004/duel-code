@@ -7,14 +7,16 @@ export const getCurrentUserData = async () => {
     try {
         const user = await currentUser()
 
+        if (!user) return null
+
         const data = await db.user.findUnique({
             where: {
-                clerkId : user.id,
+                clerkId: user.id,
             },
-            include:{
-                submissions:true,
-                solvedProblems:true,
-                playlists:true
+            include: {
+                submissions: true,
+                solvedProblems: true,
+                playlists: true
 
             }
         })
@@ -22,6 +24,6 @@ export const getCurrentUserData = async () => {
         return data
     } catch (error) {
         console.log(error)
-        
+        return null
     }
 }

@@ -43,7 +43,20 @@ import { deleteProblem } from "../actions";
 import CreatePlaylistModal from "./create-playlist";
 import AddToPlaylistModal from "./add-to-playlist";
 
-export const ProblemsTable = ({ problems, user }) => {
+interface Problem {
+  id: string;
+  title: string;
+  difficulty: "EASY" | "MEDIUM" | "HARD";
+  tags: string[];
+  solvedBy: { id: string }[];
+}
+
+interface ProblemsTableProps {
+  problems: Problem[];
+  user: { role: string } | null;
+}
+
+export const ProblemsTable = ({ problems, user }: ProblemsTableProps) => {
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState("ALL");
   const [selectedTag, setSelectedTag] = useState("ALL");
@@ -51,13 +64,13 @@ export const ProblemsTable = ({ problems, user }) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isAddToPlaylistModalOpen, setIsAddToPlaylistModalOpen] =
     useState(false);
-  const [selectedProblemId, setSelectedProblemId] = useState(null);
+  const [selectedProblemId, setSelectedProblemId] = useState<string | null>(null);
 
   // Extract all unique tags from problems
   const allTags = useMemo(() => {
-    if (!Array.isArray(problems)) return [];
-    const tagsSet = new Set();
-    problems.forEach((p) => p.tags?.forEach((t) => tagsSet.add(t)));
+    if (!Array.isArray(problems)) return [] as string[];
+    const tagsSet = new Set<string>();
+    problems.forEach((p) => p.tags?.forEach((t: string) => tagsSet.add(t)));
     return Array.from(tagsSet);
   }, [problems]);
 
@@ -88,7 +101,7 @@ export const ProblemsTable = ({ problems, user }) => {
     );
   }, [filteredProblems, currentPage]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     const result = await deleteProblem(id);
     if (result.success) {
       toast.success(result.message);
@@ -97,7 +110,7 @@ export const ProblemsTable = ({ problems, user }) => {
     }
   };
 
-  const handleCreatePlaylist = async (data) => {
+  const handleCreatePlaylist = async (data: { name: string; description?: string }) => {
     try {
 
       console.log("creating Playlist");
@@ -127,7 +140,7 @@ export const ProblemsTable = ({ problems, user }) => {
     }
   };
 
-  const handleAddToPlaylist = async (problemId, playlistId) => {
+  const handleAddToPlaylist = async (problemId: string, playlistId: string) => {
     try {
       const response = await fetch("/api/playlists/add-problem", {
         method: "POST",
@@ -149,7 +162,7 @@ export const ProblemsTable = ({ problems, user }) => {
     }
   };
 
-  const getDifficultyVariant = (difficulty) => {
+  const getDifficultyVariant = (difficulty: string) => {
     switch (difficulty) {
       case "EASY":
         return "default";
@@ -162,7 +175,7 @@ export const ProblemsTable = ({ problems, user }) => {
     }
   };
 
-  const getDifficultyColor = (difficulty) => {
+  const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "EASY":
         return "bg-green-100 text-green-800 hover:bg-green-100";
@@ -261,7 +274,7 @@ export const ProblemsTable = ({ problems, user }) => {
             </TableHeader>
             <TableBody>
               {paginatedProblems.length > 0 ? (
-                paginatedProblems.map((problem) => {
+                paginatedProblems.map((problem: Problem) => {
                   const isSolved = problem.solvedBy.length > 0;
                   return (
                     <TableRow key={problem.id}>
@@ -282,7 +295,7 @@ export const ProblemsTable = ({ problems, user }) => {
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1">
-                          {(problem.tags || []).map((tag, idx) => (
+                          {(problem.tags || []).map((tag: string, idx: number) => (
                             <Badge
                               key={idx}
                               variant="outline"
@@ -314,9 +327,9 @@ export const ProblemsTable = ({ problems, user }) => {
                                 <TrashIcon className="h-4 w-4" />
                               </Button>
                               <Link href={`/update-problem/${problem.id}`}>
-                              <Button variant="outline" size="sm">
-                                <PencilIcon className="h-4 w-4" />
-                              </Button>
+                                <Button variant="outline" size="sm">
+                                  <PencilIcon className="h-4 w-4" />
+                                </Button>
                               </Link>
                             </>
                           )}

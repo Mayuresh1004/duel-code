@@ -30,7 +30,8 @@ export async function GET() {
         let createdCount = 0;
         let updatedCount = 0;
 
-        for (const problem of allProblems) {
+        for (const problemData of allProblems) {
+            const problem = problemData as any;
             const { id, title, description, difficulty, tags, constraints, testCases, codeSnippets, referenceSolutions, driverCode, examples } = problem;
 
             const existingProblem = await db.problem.findUnique({
@@ -41,26 +42,23 @@ export async function GET() {
                 title,
                 description,
                 difficulty: difficulty as any,
-                tags,
+                tags: [...tags] as string[],
                 constraints,
-                testCases,
-                codeSnippets,
-                referenceSolution: referenceSolutions, // Map plural to singular
-                driverCode: driverCode || {}, // Ensure not null if optional
-                examples: examples || {},
+                testCases: testCases as any,
+                codeSnippets: codeSnippets as any,
+                referenceSolution: referenceSolutions as any,
+                driverCode: (driverCode || {}) as any,
+                examples: (examples || {}) as any,
                 userId: dbUser.id,
-                // hints and editorial are missing in static data, optional in DB
             };
 
             if (existingProblem) {
-                // Update
                 await db.problem.update({
                     where: { id: existingProblem.id },
                     data
                 });
                 updatedCount++;
             } else {
-                // Create
                 await db.problem.create({
                     data
                 });

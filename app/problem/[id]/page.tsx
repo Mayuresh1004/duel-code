@@ -47,7 +47,7 @@ import { SubmissionHistory } from "@/modules/problems/components/submission-hist
 // import { TestCaseTable } from "@/modules/problems/components/test-case-table";
 // import { SubmissionHistory } from "@/modules/problems/components/submission-history";
 
-const getDifficultyColor = (difficulty) => {
+const getDifficultyColor = (difficulty: string) => {
   switch (difficulty) {
     case "EASY":
       return "bg-green-100 text-green-800 border-green-200";
@@ -60,16 +60,17 @@ const getDifficultyColor = (difficulty) => {
   }
 };
 
+type Language = "JAVASCRIPT" | "PYTHON" | "JAVA" | "CPP" | "GOLANG";
+
 const ProblemIdPage = () => {
   const params = useParams();
-  const [problem, setProblem] = useState(null);
-  const [selectedLanguage, setSelectedLanguage] = useState("JAVASCRIPT");
+  const [problem, setProblem] = useState<any>(null);
+  const [selectedLanguage, setSelectedLanguage] = useState<Language>("JAVASCRIPT");
   const [code, setCode] = useState("");
-  const [output, setOutput] = useState("");
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submissionHistory, setSubmissionHistory] = useState([]);
-  const [executionResponse, setExecutionResponse] = useState(null);
+  const [submissionHistory, setSubmissionHistory] = useState<any[]>([]);
+  const [executionResponse, setExecutionResponse] = useState<any>(null);
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -79,11 +80,12 @@ const ProblemIdPage = () => {
         if (!problemId || typeof problemId !== "string") return;
 
         const problemData = await getProblembyId(problemId);
-        if (problemData.success) {
+        if (problemData.success && problemData.data) {
           console.log(problemData.data);
           setProblem(problemData.data);
 
-          setCode(problemData.data.codeSnippets[selectedLanguage] || "");
+          const snippets = problemData.data.codeSnippets as Record<string, string>;
+          setCode(snippets?.[selectedLanguage] || "");
         }
       } catch (error) {
         console.error("Error fetching problem:", error);
@@ -112,16 +114,22 @@ const ProblemIdPage = () => {
 
 
   useEffect(() => {
-    if (problem && problem.codeSnippets[selectedLanguage]) {
-      setCode(problem.codeSnippets[selectedLanguage]);
+    if (problem) {
+      const snippets = problem.codeSnippets as Record<string, string>;
+      if (snippets?.[selectedLanguage]) {
+        setCode(snippets[selectedLanguage]);
+      }
     }
   }, [selectedLanguage, problem]);
 
   const handleRun = async () => {
     try {
       setIsRunning(true);
-      const stdin = problem.testCases.map((tc) => tc.input);
-      const expected_outputs = problem.testCases.map((tc) => tc.output);
+      if (!problem) return;
+
+      const testCases = problem.testCases as any[];
+      const stdin = testCases.map((tc: any) => tc.input);
+      const expected_outputs = testCases.map((tc: any) => tc.output);
       // Run against public test cases only
       const res = await executeCode(
         code,
@@ -145,27 +153,28 @@ const ProblemIdPage = () => {
     }
   };
 
-      useEffect(()=>{
-    const fetchSubmissionHistory = async()=>{
+  useEffect(() => {
+    const fetchSubmissionHistory = async () => {
       try {
-        const resolvedParams =  params;
-        const submissionHistory = await getAllSubmissionByUser(resolvedParams.id);
-        console.log(submissionHistory);
-        if (submissionHistory.success) {
-          setSubmissionHistory(submissionHistory.data);
+        const resolvedParams = params;
+        const historyRes = await getAllSubmissionByUser(resolvedParams.id as string);
+        if (historyRes.success) {
+          setSubmissionHistory(historyRes.data || []);
         }
-      } catch (error) {
-        console.error('Error fetching problem:', error);
+      } catch (error: any) {
+        console.error('Error fetching problem history:', error);
       }
     }
 
     fetchSubmissionHistory();
-  },[params])  
+  }, [params])
 
 
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
+      if (!problem) return;
+
       const res = await submitCode(
         code,
         selectedLanguage,
@@ -218,7 +227,7 @@ const ProblemIdPage = () => {
               </Badge>
             </div>
             <div className="flex flex-wrap gap-2">
-              {problem?.tags.map((tag) => (
+              {problem?.tags?.map((tag: string) => (
                 <Badge key={tag} variant="outline" className="text-sm">
                   {tag}
                 </Badge>
@@ -246,14 +255,14 @@ const ProblemIdPage = () => {
                   {/* Examples */}
                   <div>
                     <h3 className="font-semibold text-lg mb-3">Example:</h3>
-                    {problem?.examples[selectedLanguage] && (
+                    {(problem?.examples as any)?.[selectedLanguage] && (
                       <div className="bg-muted p-4 rounded-lg space-y-2">
                         <div>
                           <span className="font-medium text-amber-400">
                             Input:{" "}
                           </span>
                           <code className="text-sm dark:bg-zinc-900 bg-zinc-200 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded">
-                            {problem?.examples[selectedLanguage].input}
+                            {(problem?.examples as any)[selectedLanguage].input}
                           </code>
                         </div>
                         <div>
@@ -261,13 +270,13 @@ const ProblemIdPage = () => {
                             Output:{" "}
                           </span>
                           <code className="text-sm dark:bg-zinc-900 bg-zinc-200 text-zinc-900 dark:text-zinc-200 px-2 py-1 rounded">
-                            {problem?.examples[selectedLanguage].output}
+                            {(problem?.examples as any)[selectedLanguage].output}
                           </code>
                         </div>
                         <div>
                           <span className="font-medium">Explanation: </span>
                           <span className="text-sm">
-                            {problem?.examples[selectedLanguage]?.explanation}
+                            {(problem?.examples as any)[selectedLanguage]?.explanation}
                           </span>
                         </div>
                       </div>
@@ -319,14 +328,14 @@ const ProblemIdPage = () => {
                   </TabsContent>
                   <TabsContent value="editorial" className="p-6">
                     <div className="text-center py-8 text-muted-foreground">
-                      {problem.editorial
+                      {problem?.editorial
                         ? problem.editorial
                         : "Editorial not available yet."}
                     </div>
                   </TabsContent>
                   <TabsContent value="hints" className="p-6">
                     <div className="text-center py-8 text-muted-foreground">
-                      {problem.hints
+                      {problem?.hints
                         ? problem.hints
                         : "No hints available for this problem."}
                     </div>
@@ -346,7 +355,7 @@ const ProblemIdPage = () => {
                   </CardTitle>
                   <Select
                     value={selectedLanguage}
-                    onValueChange={setSelectedLanguage}
+                    onValueChange={(value: string) => setSelectedLanguage(value as Language)}
                   >
                     <SelectTrigger className="w-32">
                       <SelectValue />
@@ -417,7 +426,7 @@ const ProblemIdPage = () => {
               <CardContent>
                 <ScrollArea className="h-48">
                   <div className="space-y-4">
-                    {problem.testCases.map((testCase, index) => (
+                    {(problem?.testCases as any[])?.map((testCase: any, index: number) => (
                       <div key={index} className="border rounded-lg p-3">
                         <div className="text-sm font-medium mb-2">
                           Test Case {index + 1}

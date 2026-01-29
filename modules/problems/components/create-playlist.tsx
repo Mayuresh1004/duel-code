@@ -22,7 +22,13 @@ const playlistSchema = z.object({
   description: z.string().max(500, "Description is too long").optional(),
 });
 
-const CreatePlaylistModal = ({ isOpen, onClose, onSubmit }) => {
+interface CreatePlaylistModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: z.infer<typeof playlistSchema>) => Promise<void>;
+}
+
+const CreatePlaylistModal = ({ isOpen, onClose, onSubmit }: CreatePlaylistModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const {
@@ -34,7 +40,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, onSubmit }) => {
     resolver: zodResolver(playlistSchema),
   });
 
-  const handleFormSubmit = async (data) => {
+  const handleFormSubmit = async (data: z.infer<typeof playlistSchema>) => {
     try {
       setIsLoading(true);
       await onSubmit(data);

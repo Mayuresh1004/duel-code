@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
             driverCode,
             hints,
             editorial
-        }: any = body;
+        } = body as any;
 
         if (!title || !description || !difficulty || !testCases || !codeSnippets || !referenceSolutions) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
@@ -132,18 +132,18 @@ export async function POST(request: NextRequest) {
             data: {
                 title,
                 description,
-                difficulty,
-                tags,
-                examples,
-                constraints,
-                testCases,
-                codeSnippets,
-                referenceSolution: referenceSolutions,
-                driverCode,
-                hints,
-                editorial,
+                difficulty: difficulty as any,
+                tags: tags as string[],
+                examples: examples as any,
+                constraints: constraints as string,
+                testCases: testCases as any,
+                codeSnippets: codeSnippets as any,
+                referenceSolution: referenceSolutions as any,
+                driverCode: driverCode as any,
+                hints: hints as any,
+                editorial: editorial as any,
 
-                userId: userId
+                userId: userId as string
             }
         })
 

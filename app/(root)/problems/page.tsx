@@ -10,14 +10,14 @@ const ProblemsPage = async () => {
 
   let dbUser = null
 
-  if(user){
-     dbUser = await db.user.findUnique({
+  if (user) {
+    dbUser = await db.user.findUnique({
       where: { clerkId: user.id },
       select: { id: true, role: true }
     });
   }
 
-  const {data:problems , error} = await getAllProblems()
+  const { data: problems, error } = await getAllProblems()
 
   if (error) {
     return (
@@ -29,7 +29,7 @@ const ProblemsPage = async () => {
 
   return (
     <div className='container mx-auto py-32'>
-      <ProblemsTable problems={problems} user={dbUser}/>
+      <ProblemsTable problems={problems || []} user={dbUser || null} />
     </div>
   )
 }

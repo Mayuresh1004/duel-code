@@ -3,7 +3,20 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { CheckCircle2, XCircle, Clock, Cpu, Code, Calendar } from "lucide-react";
 
-export const SubmissionHistory = ({ submissions = [] }) => {
+interface Submission {
+  id: string;
+  createdAt: Date | string;
+  status: string;
+  language: string;
+  memory: string | null;
+  time: string | null;
+}
+
+interface SubmissionHistoryProps {
+  submissions?: Submission[];
+}
+
+export const SubmissionHistory = ({ submissions = [] }: SubmissionHistoryProps) => {
   if (!submissions.length) {
     return (
       <Card className="w-full">
@@ -15,31 +28,31 @@ export const SubmissionHistory = ({ submissions = [] }) => {
     );
   }
 
-  const formatMemory = (memory) => {
+  const formatMemory = (memory: string | null) => {
     if (!memory) return 'N/A';
     try {
-      const memoryArray = JSON.parse(memory);
-      const avgMemory = memoryArray.reduce((a, b) => parseFloat(a) + parseFloat(b), 0) / memoryArray.length;
+      const memoryArray = JSON.parse(memory) as string[];
+      const avgMemory = memoryArray.reduce((acc: number, val: string) => acc + parseFloat(val), 0) / memoryArray.length;
       return `${avgMemory.toFixed(2)} KB`;
     } catch {
       return 'N/A';
     }
   };
 
-  const formatTime = (time) => {
+  const formatTime = (time: string | null) => {
     if (!time) return 'N/A';
     try {
-      const timeArray = JSON.parse(time);
+      const timeArray = JSON.parse(time) as string[];
       const avgTime = timeArray
-        .map(t => parseFloat(t.replace(" s", "")))
-        .reduce((a, b) => a + b, 0) / timeArray.length;
+        .map((t: string) => parseFloat(String(t).replace(" s", "")))
+        .reduce((acc: number, val: number) => acc + val, 0) / timeArray.length;
       return `${avgTime.toFixed(3)} s`;
     } catch {
       return 'N/A';
     }
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',

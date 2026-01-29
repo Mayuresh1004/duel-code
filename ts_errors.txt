@@ -1,0 +1,141 @@
+﻿app/(root)/profile/page.tsx(32,32): error TS2322: Type '{ id: string; createdAt: Date; userId: string; problemId: string; sourceCode: JsonValue; language: string; stdin: string | null; stdout: string | null; stderr: string | null; compileOutput: string | null; status: string; memory: string | null; time: string | null; }[]' is not assignable to type 'never[]'.
+  Type '{ id: string; createdAt: Date; userId: string; problemId: string; sourceCode: JsonValue; language: string; stdin: string | null; stdout: string | null; stderr: string | null; compileOutput: string | null; status: string; memory: string | null; time: string | null; }' is not assignable to type 'never'.
+app/api/create-problem/route.ts(146,17): error TS2322: Type 'string | { success: boolean; error: string; }' is not assignable to type 'string | undefined'.
+  Type '{ success: boolean; error: string; }' is not assignable to type 'string'.
+app/api/seed-new-problems/route.ts(34,121): error TS2339: Property 'driverCode' does not exist on type '{ id: string; title: string; difficulty: string; tags: string[]; description: string; constraints: string; testCases: { input: string; output: string; }[]; examples: { JAVASCRIPT: { input: string; output: string; explanation: string; }; PYTHON: { ...; }; JAVA: { ...; }; CPP: { ...; }; GOLANG: { ...; }; }; codeSnippe...'.
+app/api/seed-new-problems/route.ts(59,21): error TS2322: Type '{ title: string; description: string; difficulty: any; tags: string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]; ... 6 more ...; userId: string; }' is not assignable to type '(Without<ProblemUpdateInput, ProblemUncheckedUpdateInput> & ProblemUncheckedUpdateInput) | (Without<...> & ProblemUpdateInput)'.
+  Type '{ title: string; description: string; difficulty: any; tags: string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]; ... 6 more ...; userId: string; }' is not assignable to type 'Without<ProblemUpdateInput, ProblemUncheckedUpdateInput> & ProblemUncheckedUpdateInput'.
+    Types of property 'tags' are incompatible.
+      Type 'string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]' is not assignable to type 'string[] | ProblemUpdatetagsInput | undefined'.
+        Type 'readonly ["Array", "Hash Table"]' is not assignable to type 'string[] | ProblemUpdatetagsInput | undefined'.
+          The type 'readonly ["Array", "Hash Table"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+app/api/seed-new-problems/route.ts(65,21): error TS2322: Type '{ title: string; description: string; difficulty: any; tags: string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]; ... 6 more ...; userId: string; }' is not assignable to type '(Without<ProblemCreateInput, ProblemUncheckedCreateInput> & ProblemUncheckedCreateInput) | (Without<...> & ProblemCreateInput)'.
+  Type '{ title: string; description: string; difficulty: any; tags: string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]; ... 6 more ...; userId: string; }' is not assignable to type 'Without<ProblemCreateInput, ProblemUncheckedCreateInput> & ProblemUncheckedCreateInput'.
+    Type '{ title: string; description: string; difficulty: any; tags: string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]; ... 6 more ...; userId: string; }' is not assignable to type 'ProblemUncheckedCreateInput'.
+      Types of property 'tags' are incompatible.
+        Type 'string[] | readonly ["Array", "Hash Table"] | readonly ["Array", "Hash Table", "Sorting"] | readonly ["String", "Two Pointers"] | readonly ["Dynamic Programming", "Math"]' is not assignable to type 'string[] | ProblemCreatetagsInput | undefined'.
+          Type 'readonly ["Array", "Hash Table"]' is not assignable to type 'string[] | ProblemCreatetagsInput | undefined'.
+            The type 'readonly ["Array", "Hash Table"]' is 'readonly' and cannot be assigned to the mutable type 'string[]'.
+app/problem/[id]/page.tsx(50,29): error TS7006: Parameter 'difficulty' implicitly has an 'any' type.
+app/problem/[id]/page.tsx(84,22): error TS2345: Argument of type '{ id: string; createdAt: Date; updatedAt: Date; title: string; description: string; difficulty: Difficulty; tags: string[]; userId: string; examples: JsonValue; ... 6 more ...; driverCode: JsonValue; } | null | undefined' is not assignable to parameter of type 'SetStateAction<null>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<null>'.
+app/problem/[id]/page.tsx(86,19): error TS18049: 'problemData.data' is possibly 'null' or 'undefined'.
+app/problem/[id]/page.tsx(86,19): error TS18047: 'problemData.data.codeSnippets' is possibly 'null'.
+app/problem/[id]/page.tsx(86,19): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type 'string | number | boolean | JsonObject | JsonArray'.
+  No index signature with a parameter of type 'string' was found on type 'string | number | boolean | JsonObject | JsonArray'.
+app/problem/[id]/page.tsx(115,28): error TS2339: Property 'codeSnippets' does not exist on type 'never'.
+app/problem/[id]/page.tsx(116,23): error TS2339: Property 'codeSnippets' does not exist on type 'never'.
+app/problem/[id]/page.tsx(123,21): error TS18047: 'problem' is possibly 'null'.
+app/problem/[id]/page.tsx(123,44): error TS7006: Parameter 'tc' implicitly has an 'any' type.
+app/problem/[id]/page.tsx(124,32): error TS18047: 'problem' is possibly 'null'.
+app/problem/[id]/page.tsx(124,55): error TS7006: Parameter 'tc' implicitly has an 'any' type.
+app/problem/[id]/page.tsx(131,9): error TS18047: 'problem' is possibly 'null'.
+app/problem/[id]/page.tsx(134,28): error TS2345: Argument of type '{ success: boolean; error: any; data?: undefined; message?: undefined; } | { success: boolean; error: any; data: { status: any; results: any; }; message?: undefined; } | { success: boolean; message: string; data: { ...; }; error?: undefined; }' is not assignable to parameter of type 'SetStateAction<null>'.
+  Type '{ success: boolean; error: any; data?: undefined; message?: undefined; }' is not assignable to type 'SetStateAction<null>'.
+    Type '{ success: boolean; error: any; data?: undefined; message?: undefined; }' provides no match for the signature '(prevState: null): null'.
+app/problem/[id]/page.tsx(142,19): error TS18046: 'error' is of type 'unknown'.
+app/problem/[id]/page.tsx(155,32): error TS2345: Argument of type '({ testCases: { id: string; createdAt: Date; stdout: string | null; stderr: string | null; compileOutput: string | null; status: string; memory: string | null; time: string | null; submissionId: string; testCase: number; passed: boolean; expected: string; }[]; } & { ...; })[] | undefined' is not assignable to parameter of type 'SetStateAction<never[]>'.
+  Type 'undefined' is not assignable to type 'SetStateAction<never[]>'.
+app/problem/[id]/page.tsx(172,9): error TS18047: 'problem' is possibly 'null'.
+app/problem/[id]/page.tsx(175,28): error TS2345: Argument of type '{ success: boolean; error: any; data?: undefined; message?: undefined; submission?: undefined; } | { success: boolean; error: any; data: { status: any; results: any; submissionId?: undefined; }; message?: undefined; submission?: undefined; } | { ...; }' is not assignable to parameter of type 'SetStateAction<null>'.
+  Type '{ success: boolean; error: any; data?: undefined; message?: undefined; submission?: undefined; }' is not assignable to type 'SetStateAction<null>'.
+    Type '{ success: boolean; error: any; data?: undefined; message?: undefined; submission?: undefined; }' provides no match for the signature '(prevState: null): null'.
+app/problem/[id]/page.tsx(210,60): error TS2339: Property 'title' does not exist on type 'never'.
+app/problem/[id]/page.tsx(214,47): error TS2339: Property 'difficulty' does not exist on type 'never'.
+app/problem/[id]/page.tsx(217,27): error TS2339: Property 'difficulty' does not exist on type 'never'.
+app/problem/[id]/page.tsx(221,25): error TS2339: Property 'tags' does not exist on type 'never'.
+app/problem/[id]/page.tsx(221,35): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+app/problem/[id]/page.tsx(243,31): error TS2339: Property 'description' does not exist on type 'never'.
+app/problem/[id]/page.tsx(249,31): error TS2339: Property 'examples' does not exist on type 'never'.
+app/problem/[id]/page.tsx(256,39): error TS2339: Property 'examples' does not exist on type 'never'.
+app/problem/[id]/page.tsx(264,39): error TS2339: Property 'examples' does not exist on type 'never'.
+app/problem/[id]/page.tsx(270,39): error TS2339: Property 'examples' does not exist on type 'never'.
+app/problem/[id]/page.tsx(281,35): error TS2339: Property 'constraints' does not exist on type 'never'.
+app/problem/[id]/page.tsx(322,32): error TS2339: Property 'editorial' does not exist on type 'never'.
+app/problem/[id]/page.tsx(323,35): error TS2339: Property 'editorial' does not exist on type 'never'.
+app/problem/[id]/page.tsx(329,32): error TS2339: Property 'hints' does not exist on type 'never'.
+app/problem/[id]/page.tsx(330,35): error TS2339: Property 'hints' does not exist on type 'never'.
+app/problem/[id]/page.tsx(420,30): error TS2339: Property 'testCases' does not exist on type 'never'.
+app/problem/[id]/page.tsx(420,45): error TS7006: Parameter 'testCase' implicitly has an 'any' type.
+app/problem/[id]/page.tsx(420,55): error TS7006: Parameter 'index' implicitly has an 'any' type.
+app/problem/[id]/page.tsx(451,53): error TS2339: Property 'submission' does not exist on type 'never'.
+app/problem/[id]/page.tsx(453,66): error TS2339: Property 'submission' does not exist on type 'never'.
+app/problem/[id]/page.tsx(454,61): error TS2339: Property 'submission' does not exist on type 'never'.
+app/problem/[id]/page.tsx(458,53): error TS2339: Property 'data' does not exist on type 'never'.
+app/problem/[id]/page.tsx(460,61): error TS2339: Property 'data' does not exist on type 'never'.
+components/ui/resizable.tsx(12,51): error TS2339: Property 'PanelGroup' does not exist on type 'typeof import("C:/Users/Mayuresh/OneDrive/Desktop/WebDevPro/Nextjs/code-grind/node_modules/.pnpm/react-resizable-panels@4.3._d8ddf8a12f5cae77f5ff7ea7e77e80a5/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(14,25): error TS2339: Property 'PanelGroup' does not exist on type 'typeof import("C:/Users/Mayuresh/OneDrive/Desktop/WebDevPro/Nextjs/code-grind/node_modules/.pnpm/react-resizable-panels@4.3._d8ddf8a12f5cae77f5ff7ea7e77e80a5/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(35,51): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("C:/Users/Mayuresh/OneDrive/Desktop/WebDevPro/Nextjs/code-grind/node_modules/.pnpm/react-resizable-panels@4.3._d8ddf8a12f5cae77f5ff7ea7e77e80a5/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(39,25): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("C:/Users/Mayuresh/OneDrive/Desktop/WebDevPro/Nextjs/code-grind/node_modules/.pnpm/react-resizable-panels@4.3._d8ddf8a12f5cae77f5ff7ea7e77e80a5/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+components/ui/resizable.tsx(52,26): error TS2339: Property 'PanelResizeHandle' does not exist on type 'typeof import("C:/Users/Mayuresh/OneDrive/Desktop/WebDevPro/Nextjs/code-grind/node_modules/.pnpm/react-resizable-panels@4.3._d8ddf8a12f5cae77f5ff7ea7e77e80a5/node_modules/react-resizable-panels/dist/react-resizable-panels")'.
+modules/problems/actions/index.ts(701,46): error TS7006: Parameter 'problemId' implicitly has an 'any' type.
+modules/problems/components/add-to-playlist.tsx(16,31): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+modules/problems/components/add-to-playlist.tsx(16,39): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+modules/problems/components/add-to-playlist.tsx(16,48): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
+modules/problems/components/add-to-playlist.tsx(16,58): error TS7031: Binding element 'problemId' implicitly has an 'any' type.
+modules/problems/components/add-to-playlist.tsx(42,38): error TS7006: Parameter 'playlistId' implicitly has an 'any' type.
+modules/problems/components/add-to-playlist.tsx(69,33): error TS2339: Property 'id' does not exist on type 'never'.
+modules/problems/components/add-to-playlist.tsx(73,59): error TS2339: Property 'name' does not exist on type 'never'.
+modules/problems/components/add-to-playlist.tsx(74,31): error TS2339: Property 'description' does not exist on type 'never'.
+modules/problems/components/add-to-playlist.tsx(76,35): error TS2339: Property 'description' does not exist on type 'never'.
+modules/problems/components/add-to-playlist.tsx(82,65): error TS2339: Property 'id' does not exist on type 'never'.
+modules/problems/components/create-playlist.tsx(25,32): error TS7031: Binding element 'isOpen' implicitly has an 'any' type.
+modules/problems/components/create-playlist.tsx(25,40): error TS7031: Binding element 'onClose' implicitly has an 'any' type.
+modules/problems/components/create-playlist.tsx(25,49): error TS7031: Binding element 'onSubmit' implicitly has an 'any' type.
+modules/problems/components/create-playlist.tsx(37,35): error TS7006: Parameter 'data' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(46,33): error TS7031: Binding element 'problems' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(46,43): error TS7031: Binding element 'user' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(60,46): error TS7006: Parameter 't' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(70,16): error TS7006: Parameter 'problem' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(73,16): error TS7006: Parameter 'problem' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(76,16): error TS7006: Parameter 'problem' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(91,31): error TS7006: Parameter 'id' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(100,39): error TS7006: Parameter 'data' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(130,38): error TS7006: Parameter 'problemId' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(130,49): error TS7006: Parameter 'playlistId' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(152,33): error TS7006: Parameter 'difficulty' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(165,31): error TS7006: Parameter 'difficulty' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(238,33): error TS2322: Type 'unknown' is not assignable to type 'Key | null | undefined'.
+modules/problems/components/problems-table.tsx(238,43): error TS2322: Type 'unknown' is not assignable to type 'string'.
+modules/problems/components/problems-table.tsx(239,23): error TS2322: Type 'unknown' is not assignable to type 'ReactNode'.
+modules/problems/components/problems-table.tsx(264,40): error TS7006: Parameter 'problem' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(285,54): error TS7006: Parameter 'tag' implicitly has an 'any' type.
+modules/problems/components/problems-table.tsx(285,59): error TS7006: Parameter 'idx' implicitly has an 'any' type.
+modules/problems/components/submission-details.tsx(5,37): error TS7031: Binding element 'submission' implicitly has an 'any' type.
+modules/problems/components/submission-details.tsx(8,43): error TS7006: Parameter 'a' implicitly has an 'any' type.
+modules/problems/components/submission-details.tsx(8,46): error TS7006: Parameter 'b' implicitly has an 'any' type.
+modules/problems/components/submission-details.tsx(13,12): error TS7006: Parameter 't' implicitly has an 'any' type.
+modules/problems/components/submission-details.tsx(14,16): error TS7006: Parameter 'a' implicitly has an 'any' type.
+modules/problems/components/submission-details.tsx(14,19): error TS7006: Parameter 'b' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(18,25): error TS7006: Parameter 'memory' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(22,45): error TS7006: Parameter 'a' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(22,48): error TS7006: Parameter 'b' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(29,23): error TS7006: Parameter 'time' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(34,14): error TS7006: Parameter 't' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(35,18): error TS7006: Parameter 'a' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(35,21): error TS7006: Parameter 'b' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(42,23): error TS7006: Parameter 'dateString' implicitly has an 'any' type.
+modules/problems/components/submission-history.tsx(62,37): error TS2339: Property 'id' does not exist on type 'never'.
+modules/problems/components/submission-history.tsx(66,35): error TS2339: Property 'status' does not exist on type 'never'.
+modules/problems/components/submission-history.tsx(80,46): error TS2339: Property 'createdAt' does not exist on type 'never'.
+modules/problems/components/submission-history.tsx(89,72): error TS2339: Property 'language' does not exist on type 'never'.
+modules/problems/components/submission-history.tsx(96,85): error TS2339: Property 'memory' does not exist on type 'never'.
+modules/problems/components/submission-history.tsx(103,83): error TS2339: Property 'time' does not exist on type 'never'.
+modules/problems/components/test-case-table.tsx(6,33): error TS7031: Binding element 'testCases' implicitly has an 'any' type.
+modules/problems/components/test-case-table.tsx(24,27): error TS7006: Parameter 'testCase' implicitly has an 'any' type.
+modules/problems/components/test-case-table.tsx(24,37): error TS7006: Parameter 'index' implicitly has an 'any' type.
+modules/profile/actions/index.ts(12,27): error TS18047: 'user' is possibly 'null'.
+modules/profile/components/playlist-section.tsx(8,29): error TS7031: Binding element 'playlists' implicitly has an 'any' type.
+modules/profile/components/playlist-section.tsx(9,23): error TS7006: Parameter 'dateString' implicitly has an 'any' type.
+modules/profile/components/playlist-section.tsx(40,27): error TS7006: Parameter 'playlist' implicitly has an 'any' type.
+modules/profile/components/profile-stats.tsx(7,25): error TS7031: Binding element 'submissions' implicitly has an 'any' type.
+modules/profile/components/profile-stats.tsx(7,38): error TS7031: Binding element 'solvedCount' implicitly has an 'any' type.
+modules/profile/components/profile-stats.tsx(7,51): error TS7031: Binding element 'playlistCount' implicitly has an 'any' type.
+modules/profile/components/profile-stats.tsx(8,50): error TS7006: Parameter 's' implicitly has an 'any' type.
+modules/profile/components/profile-stats.tsx(9,43): error TS7006: Parameter 's' implicitly has an 'any' type.
+modules/profile/components/solved-problems.tsx(7,27): error TS7031: Binding element 'solvedProblems' implicitly has an 'any' type.
+modules/profile/components/solved-problems.tsx(8,23): error TS7006: Parameter 'dateString' implicitly has an 'any' type.
+modules/profile/components/solved-problems.tsx(24,18): error TS2322: Type '"success"' is not assignable to type '"default" | "destructive" | "outline" | "secondary" | null | undefined'.
+modules/profile/components/solved-problems.tsx(41,32): error TS7006: Parameter 'problem' implicitly has an 'any' type.
+modules/profile/components/user-info.tsx(9,25): error TS7031: Binding element 'userData' implicitly has an 'any' type.
+modules/profile/components/user-info.tsx(10,23): error TS7006: Parameter 'dateString' implicitly has an 'any' type.

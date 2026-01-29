@@ -13,22 +13,35 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Plus, Check } from "lucide-react";
 import { toast } from "sonner";
 
-const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
-  const [playlists, setPlaylists] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+interface Playlist {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+interface AddToPlaylistModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (problemId: string, playlistId: string) => Promise<void>;
+  problemId: string | null;
+}
+
+const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }: AddToPlaylistModalProps) => {
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const loadPlaylists = async () => {
+    const loadPlaylists = async (): Promise<void> => {
       try {
-        const response = await fetch('/api/playlists');
-        const data = await response.json();
+        const response: Response = await fetch('/api/playlists');
+        const data: any = await response.json();
         if (response.ok) {
           setPlaylists(data);
 
         } else {
           throw new Error(data.error || "Failed to load playlists");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error loading playlists:', error);
         toast.error("Failed to load playlists");
       }
@@ -39,12 +52,14 @@ const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
     }
   }, [isOpen]);
 
-  const handleAddToPlaylist = async (playlistId) => {
+  const handleAddToPlaylist = async (playlistId: string): Promise<void> => {
     try {
       setIsLoading(true);
-      await onSubmit(problemId, playlistId);
+      if (problemId) {
+        await onSubmit(problemId, playlistId);
+      }
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding to playlist:', error);
       toast.error("Failed to add problem to playlist");
     } finally {
@@ -64,7 +79,7 @@ const AddToPlaylistModal = ({ isOpen, onClose, onSubmit, problemId }) => {
         <ScrollArea className="max-h-[300px] w-full pr-4">
           {playlists.length > 0 ? (
             <div className="space-y-2">
-              {playlists.map((playlist) => (
+              {playlists.map((playlist: Playlist) => (
                 <div
                   key={playlist.id}
                   className="flex items-center justify-between p-2 rounded-lg border hover:bg-accent"

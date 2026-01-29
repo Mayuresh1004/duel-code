@@ -4,7 +4,18 @@ import { Card, CardContent } from '@/components/ui/card';
 
 
 
-const ProfileStats = ({ submissions, solvedCount, playlistCount }) => {
+interface Submission {
+  id: string;
+  status: string;
+}
+
+interface ProfileStatsProps {
+  submissions: Submission[];
+  solvedCount: number;
+  playlistCount: number;
+}
+
+const ProfileStats = ({ submissions, solvedCount, playlistCount }: ProfileStatsProps) => {
   const acceptedSubmissions = submissions.filter(s => s.status === 'Accepted').length;
   const wrongAnswers = submissions.filter(s => s.status === 'Wrong Answer').length;
   const successRate = submissions.length > 0 ? Math.round((acceptedSubmissions / submissions.length) * 100) : 0;
@@ -50,13 +61,13 @@ const ProfileStats = ({ submissions, solvedCount, playlistCount }) => {
             className={`${stat.bgColor} hover:shadow-md transition-all duration-200`}
           >
             <CardContent className="p-6">
-            <div className="flex items-center justify-between mb-3">
-              <Icon className={`w-6 h-6 ${stat.iconColor}`} />
-            </div>
-            <div className="space-y-1">
-              <p className="text-2xl font-bold">{stat.value}</p>
-              <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
-            </div>
+              <div className="flex items-center justify-between mb-3">
+                <Icon className={`w-6 h-6 ${stat.iconColor}`} />
+              </div>
+              <div className="space-y-1">
+                <p className="text-2xl font-bold">{stat.value}</p>
+                <p className="text-sm font-medium text-muted-foreground">{stat.label}</p>
+              </div>
             </CardContent>
           </Card>
         );

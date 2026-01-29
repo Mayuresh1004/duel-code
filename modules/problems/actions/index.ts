@@ -133,7 +133,7 @@ function prepareUserCodeForBuiltinWrapper(languageKey: string, userCode: string)
 
         return out.join("\n").trim();
     }
-// return
+    // return
     return code;
 }
 
@@ -163,7 +163,7 @@ export const getAllProblems = async () => {
 
         const data = await db.user.findUnique({
             where: {
-                clerkId: user?.id
+                clerkId: user?.id || ""
             },
             select: {
                 id: true
@@ -269,7 +269,7 @@ export const runCode = async (
     if (!user) return { success: false, error: "Unauthorized" };
 
     const dbUser = await db.user.findUnique({
-        where: { clerkId: user.id }
+        where: { clerkId: user.id || "" }
     });
 
     if (!dbUser) return { success: false, error: "User not found" };
@@ -289,9 +289,9 @@ export const runCode = async (
 
     const languageKey = typeof language === "string" ? language.toUpperCase() : String(language);
     const driverFromDb = problem?.driverCode && typeof problem.driverCode === "object"
-        ? (problem.driverCode as any)[languageKey]
+        ? (problem.driverCode as Record<string, string>)[languageKey]
         : null;
-    const builtinDriverRaw = getBuiltinDriverCode(problem?.title as any, languageKey);
+    const builtinDriverRaw = getBuiltinDriverCode(problem?.title, languageKey);
     const builtinDriver = builtinDriverRaw && !shouldSkipBuiltinWrapper(languageKey, source_code)
         ? builtinDriverRaw
         : null;
@@ -309,7 +309,7 @@ export const runCode = async (
     }
 
     const judge0Id = getJudge0LanguageId(language);
-    
+
     // Validate final source code
     if (!finalSourceCode || finalSourceCode.trim().length === 0) {
         return { success: false, error: "Source code cannot be empty" };
@@ -348,7 +348,7 @@ export const runCode = async (
     }
 
     const tokens = submitResponse.map((res: any) => res.token).filter((token: any) => token);
-    
+
     if (tokens.length === 0) {
         console.error("[runCode] No tokens received from Judge0:", submitResponse);
         return { success: false, error: "No submission tokens received from Judge0" };
@@ -380,7 +380,7 @@ export const runCode = async (
     // Check for compilation errors or runtime errors first
     const hasCompilationError = results.some((r: any) => r.status.id === 6 || r.compile_output);
     const hasRuntimeError = results.some((r: any) => r.status.id >= 7 && r.status.id <= 12);
-    
+
     if (hasCompilationError || hasRuntimeError) {
         const firstError = results.find((r: any) =>
             r.status?.id === 6 ||
@@ -399,18 +399,19 @@ export const runCode = async (
                     const stderrDecoded = decodeBase64Safe(result.stderr);
                     const compileDecoded = decodeBase64Safe(result.compile_output);
                     return {
-                    testCase: i + 1,
-                    passed: false,
-                    stdout: stdoutDecoded?.trim() || null,
-                    expected: expected_output[i]?.trim(),
-                    stderr: stderrDecoded,
-                    compile_output: compileDecoded,
-                    message: result.message || null,
-                    status: result.status.description,
-                    statusId: result.status.id,
-                    memory: result.memory ? `${result.memory} KB` : undefined,
-                    time: result.time ? `${result.time} s` : undefined,
-                }}),
+                        testCase: i + 1,
+                        passed: false,
+                        stdout: stdoutDecoded?.trim() || null,
+                        expected: expected_output[i]?.trim(),
+                        stderr: stderrDecoded,
+                        compile_output: compileDecoded,
+                        message: result.message || null,
+                        status: result.status.description,
+                        statusId: result.status.id,
+                        memory: result.memory ? `${result.memory} KB` : undefined,
+                        time: result.time ? `${result.time} s` : undefined,
+                    }
+                }),
             },
         };
     }
@@ -484,9 +485,9 @@ export const submitCode = async (
     }
 
     const driverFromDb = languageKey && problem.driverCode && typeof problem.driverCode === "object"
-        ? (problem.driverCode as any)[languageKey]
+        ? (problem.driverCode as Record<string, string>)[languageKey]
         : null;
-    const builtinDriverRaw = getBuiltinDriverCode(problem?.title as any, languageKey || String(language));
+    const builtinDriverRaw = getBuiltinDriverCode(problem?.title, languageKey || String(language));
     const builtinDriver = builtinDriverRaw && !shouldSkipBuiltinWrapper(languageKey || String(language), source_code)
         ? builtinDriverRaw
         : null;
@@ -510,7 +511,7 @@ export const submitCode = async (
     }
 
     const judge0Id = getJudge0LanguageId(language);
-    
+
     // Validate final source code
     if (!finalSourceCode || finalSourceCode.trim().length === 0) {
         return { success: false, error: "Source code cannot be empty" };
@@ -550,7 +551,7 @@ export const submitCode = async (
     }
 
     const tokens = submitResponse.map((res: any) => res.token).filter((token: any) => token);
-    
+
     if (tokens.length === 0) {
         console.error("[submitCode] No tokens received from Judge0:", submitResponse);
         return { success: false, error: "No submission tokens received from Judge0" };
@@ -567,7 +568,7 @@ export const submitCode = async (
     // Check for compilation errors or runtime errors first
     const hasCompilationError = results.some((r: any) => r.status.id === 6 || r.compile_output);
     const hasRuntimeError = results.some((r: any) => r.status.id >= 7 && r.status.id <= 12);
-    
+
     if (hasCompilationError || hasRuntimeError) {
         const firstError = results.find((r: any) =>
             r.status?.id === 6 ||
@@ -642,7 +643,7 @@ export const submitCode = async (
             problemId: problem.id,
             sourceCode: source_code, // Store ORIGINAL user code
             language: languageString,
-            stdin: JSON.stringify(testCases.map((tc: any) => tc.input)),
+            stdin: JSON.stringify((testCases as any[]).map((tc: any) => tc.input)),
             stdout: JSON.stringify(detailedResults.map((r: any) => r.stdout)),
             stderr: JSON.stringify(detailedResults.map((r: any) => r.stderr)),
             compileOutput: JSON.stringify(detailedResults.map((r: any) => r.compile_output)),
@@ -698,15 +699,15 @@ export const submitCode = async (
 }
 
 
-export const getAllSubmissionByUser = async (problemId) => {
+export const getAllSubmissionByUser = async (problemId: string) => {
     const user = await currentUser();
     if (!user) return { success: false, error: "Unauthorized" };
 
     console.log("Fetching History");
-    
+
 
     const userId = await db.user.findUnique({
-        where: { clerkId: user.id },
+        where: { clerkId: user.id || "" },
         select: { id: true }
     })
 
@@ -726,9 +727,9 @@ export const getAllSubmissionByUser = async (problemId) => {
     // revalidatePath(`/problem/${problemId}`);
 
     console.log("History Fetched");
-    
 
-    return { success: true, data: submissions }
+
+    return { success: true, data: submissions || [] }
 }
 
 // Keeping a simple alias for backward compatibility or clarity if needed, 
