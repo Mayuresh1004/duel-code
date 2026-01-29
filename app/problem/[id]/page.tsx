@@ -145,7 +145,7 @@ const ProblemIdPage = () => {
       } else {
         toast.error(res.error || "Execution failed");
       }
-    } catch (error) {
+    } catch (error:any) {
       console.error("Error running code:", error);
       toast.error(error.message);
     } finally {
