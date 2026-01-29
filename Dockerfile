@@ -5,6 +5,7 @@ WORKDIR /app
 
 # Copy lockfile and package.json
 COPY package.json pnpm-lock.yaml* ./
+COPY prisma ./prisma
 
 # Install pnpm and dependencies
 RUN npm install -g pnpm && pnpm i --frozen-lockfile
