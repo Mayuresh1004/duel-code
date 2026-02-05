@@ -1,6 +1,5 @@
 import axios from "axios"
 export function getJudge0LanguageId(language: string | number) {
-  // If it's already a number, trust it
   if (typeof language === "number") {
     return language;
   }
