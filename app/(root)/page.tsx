@@ -40,10 +40,9 @@ export default async function Home() {
   ];
 
   const stats = [
-    { number: "50K+", label: "Problems Solved" },
-    { number: "10K+", label: "Active Developers" },
-    { number: "25+", label: "Programming Languages" },
-    { number: "98%", label: "Success Rate" },
+    { number: "50+", label: "Problems Solved" },
+    { number: "5+", label: "Programming Languages" },
+    { number: "99%", label: "Success Rate" },
   ];
 
   await onBoardUser();
