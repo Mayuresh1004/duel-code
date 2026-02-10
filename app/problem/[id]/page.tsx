@@ -71,7 +71,7 @@ const ProblemIdPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submissionHistory, setSubmissionHistory] = useState<any[]>([]);
   const [executionResponse, setExecutionResponse] = useState<any>(null);
-  const { theme } = useTheme();
+  const { theme, resolvedTheme } = useTheme();
 
   useEffect(() => {
     const fetchProblem = async () => {
@@ -145,7 +145,7 @@ const ProblemIdPage = () => {
       } else {
         toast.error(res.error || "Execution failed");
       }
-    } catch (error:any) {
+    } catch (error: any) {
       console.error("Error running code:", error);
       toast.error(error.message);
     } finally {
@@ -381,7 +381,7 @@ const ProblemIdPage = () => {
                     }
                     value={code}
                     onChange={(value) => setCode(value || "")}
-                    theme={theme === "dark" ? "vs-dark" : "light"}
+                    theme={resolvedTheme === "dark" ? "vs-dark" : "light"}
                     options={{
                       minimap: { enabled: false },
                       fontSize: 16,
