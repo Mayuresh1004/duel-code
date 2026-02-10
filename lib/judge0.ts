@@ -143,6 +143,15 @@ export async function submitBatch(submissions: any) {
       }
     }
 
+    const apiUrl = process.env.JUDGE0_API_URL;
+    console.log(`[submitBatch] Using Judge0 API URL: ${apiUrl}`);
+
+    if (!apiUrl) {
+      console.error("[submitBatch] JUDGE0_API_URL is not defined in environment variables!");
+    } else if (apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
+      console.warn("[submitBatch] WARNING: Using localhost for Judge0 API. Ensure Judge0 is running locally.");
+    }
+
     const encodeB64 = (val: unknown) =>
       Buffer.from(String(val ?? ""), "utf8").toString("base64");
 
