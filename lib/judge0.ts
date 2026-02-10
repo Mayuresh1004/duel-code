@@ -143,21 +143,22 @@ export async function submitBatch(submissions: any) {
       }
     }
 
-    const apiUrl = process.env.JUDGE0_API_URL;
-    console.log(`[submitBatch] Using Judge0 API URL: ${apiUrl}`);
+    let apiUrl = process.env.JUDGE0_API_URL;
 
-    if (!apiUrl) {
-      console.error("[submitBatch] JUDGE0_API_URL is not defined in environment variables!");
-    } else if (apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
-      console.warn("[submitBatch] WARNING: Using localhost for Judge0 API. Ensure Judge0 is running locally.");
+    // Fallback if undefined or if it points to localhost (which seems to be the persistent issue)
+    if (!apiUrl || apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
+      console.warn(`[submitBatch] Invalid configured URL "${apiUrl}". Defaulting to public Judge0 API.`);
+      apiUrl = "https://ce.judge0.com";
     }
+
+    console.log(`[submitBatch] Final Judge0 API URL: ${apiUrl}`);
 
     const encodeB64 = (val: unknown) =>
       Buffer.from(String(val ?? ""), "utf8").toString("base64");
 
     const submitSingle = async (sub: any) => {
       const res = await axios.post(
-        `${process.env.JUDGE0_API_URL}/submissions?base64_encoded=true&wait=false`,
+        `${apiUrl}/submissions?base64_encoded=true&wait=false`,
         {
           language_id: sub.language_id,
           source_code: encodeB64(sub.source_code),
@@ -175,7 +176,7 @@ export async function submitBatch(submissions: any) {
 
     const postBatch = async (base64Encoded: boolean, payload: any) => {
       return await axios.post(
-        `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=${base64Encoded ? "true" : "false"}`,
+        `${apiUrl}/submissions/batch?base64_encoded=${base64Encoded ? "true" : "false"}`,
         payload,
         {
           headers: {
@@ -258,10 +259,15 @@ export async function pollBatchResults(tokens: any) {
   const maxAttempts = 60; // 60 seconds timeout
   let useBase64 = false;
 
+  let apiUrl = process.env.JUDGE0_API_URL;
+  if (!apiUrl || apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
+    apiUrl = "https://ce.judge0.com";
+  }
+
   while (attempts < maxAttempts) {
     try {
       const { data }: any = await axios.get(
-        `${process.env.JUDGE0_API_URL}/submissions/batch`,
+        `${apiUrl}/submissions/batch`,
         {
           params: {
             tokens: tokens.join(","),
