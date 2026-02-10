@@ -43,6 +43,7 @@ export default async function Home() {
     { number: "50+", label: "Problems Solved" },
     { number: "5+", label: "Programming Languages" },
     { number: "99%", label: "Success Rate" },
+    { number: "95%", label: "Faster submission" },
   ];
 
   await onBoardUser();
