@@ -1,0 +1,53 @@
+services:
+  # Judge0 instance (lightweight)
+  judge0:
+    image: judge0/judge0:latest
+    ports:
+      - "2358:2358"
+    environment:
+      - POSTGRES_HOST=judge0-db
+      - POSTGRES_DB=judge0
+      - POSTGRES_USER=judge0
+      - POSTGRES_PASSWORD=judge0
+      - REDIS_HOST=judge0-redis
+      - REDIS_PORT=6379
+    depends_on:
+      - judge0-db
+      - judge0-redis
+    restart: always
+
+  # Postgres
+  judge0-db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=judge0
+      - POSTGRES_USER=judge0
+      - POSTGRES_PASSWORD=judge0
+    volumes:
+      - judge0-db-data:/var/lib/postgresql/data
+    restart: always
+
+  # Redis
+  judge0-redis:
+    image: redis:7-alpine
+    restart: always
+
+  # Next.js App
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://judge0:judge0@judge0-db:5432/judge0
+      - JUDGE0_API_URL=http://judge0:2358
+      - REDIS_URL=redis://judge0-redis:6379
+      - NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      - CLERK_SECRET_KEY=${CLERK_SECRET_KEY}
+    depends_on:
+      - judge0
+      - judge0-db
+      - judge0-redis
+    restart: always
+
+volumes:
+  judge0-db-data:

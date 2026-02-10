@@ -1,0 +1,24 @@
+Starting Verification...
+Verifying Judge0 Integration...
+JUDGE0_API_URL: https://ce.judge0.com
+Submitting batch...
+Submission Tokens: [{"token":"dc30f7c4-a8ef-417d-8055-2a7a364e07a9"}]
+Polling results for tokens: dc30f7c4-a8ef-417d-8055-2a7a364e07a9
+Results: [
+  {
+    "stdout": "Hello Judge0\n",
+    "time": "0.01",
+    "memory": 3160,
+    "stderr": null,
+    "token": "dc30f7c4-a8ef-417d-8055-2a7a364e07a9",
+    "compile_output": null,
+    "message": null,
+    "status": {
+      "id": 3,
+      "description": "Accepted"
+    }
+  }
+]
+Batch Decoded stdout: "Hello Judge0"
+Batch Status ID: 3 (Accepted)
+✅ Batch Verification SUCCESS!

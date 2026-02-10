@@ -4,12 +4,13 @@ export function getJudge0LanguageId(language: string | number) {
     return language;
   }
 
+  // Language IDs for https://ce.judge0.com
   const languageMap: Record<string, number> = {
-    PYTHON: 71,
-    JAVASCRIPT: 63,
-    JAVA: 62,
-    CPP: 54,
-    GOLANG: 60,
+    PYTHON: 71, // Python (3.8.1) - Available
+    JAVASCRIPT: 63, // JavaScript (Node.js 12.14.0) - Available. (Also 93 for 18.15.0, 102 for 22.08.0)
+    JAVA: 62, // Java (OpenJDK 13.0.1) - Available. (Also 91 for JDK 17.0.6)
+    CPP: 54, // C++ (GCC 9.2.0) - Available. (Also 105 for GCC 14.1.0)
+    GOLANG: 60, // Go (1.13.5) - Available. (Also 107 for 1.23.5)
   };
 
   const key = language.trim().toUpperCase();
@@ -27,14 +28,22 @@ export function getJudge0LanguageId(language: string | number) {
  */
 export function getDriverCodePlaceholder(language: string | number): string {
   let languageKey: string;
-  
+
   if (typeof language === "number") {
     const languageIdMap: Record<number, string> = {
       71: 'PYTHON',
+      92: 'PYTHON',
+      100: 'PYTHON',
       63: 'JAVASCRIPT',
+      93: 'JAVASCRIPT',
+      102: 'JAVASCRIPT',
       62: 'JAVA',
+      91: 'JAVA',
       54: 'CPP',
+      105: 'CPP',
       60: 'GOLANG',
+      95: 'GOLANG',
+      106: 'GOLANG',
     };
     languageKey = languageIdMap[language] || '';
   } else {
@@ -45,7 +54,7 @@ export function getDriverCodePlaceholder(language: string | number): string {
   if (languageKey === 'PYTHON') {
     return '# @USER_CODE';
   }
-  
+
   // Default to // for JavaScript, Java, C++, Go
   return '// @USER_CODE';
 }
@@ -61,12 +70,12 @@ export function replaceUserCodeInDriver(driverCode: string, userCode: string, la
   }
 
   const placeholder = getDriverCodePlaceholder(language);
-  
+
   // Try the language-specific placeholder first (exact match)
   if (driverCode.includes(placeholder)) {
     return driverCode.replace(placeholder, userCode);
   }
-  
+
   // Try variations with different spacing and formatting
   const variations = [
     placeholder,
@@ -77,19 +86,19 @@ export function replaceUserCodeInDriver(driverCode: string, userCode: string, la
     placeholder.replace('@USER_CODE', '@USER_CODE\n'), // newline after
     placeholder.replace('@USER_CODE', '\n@USER_CODE'), // newline before
   ];
-  
+
   for (const variant of variations) {
     if (driverCode.includes(variant)) {
       return driverCode.replace(variant, userCode);
     }
   }
-  
+
   // Fallback: try both comment styles in case the driver code uses a different one
   const alternativePlaceholder = placeholder === '// @USER_CODE' ? '# @USER_CODE' : '// @USER_CODE';
   if (driverCode.includes(alternativePlaceholder)) {
     return driverCode.replace(alternativePlaceholder, userCode);
   }
-  
+
   // Try alternative with variations
   const altVariations = [
     alternativePlaceholder,
@@ -98,13 +107,13 @@ export function replaceUserCodeInDriver(driverCode: string, userCode: string, la
     alternativePlaceholder.replace('@USER_CODE', '@USER_CODE '),
     alternativePlaceholder.replace('@USER_CODE', ' @USER_CODE'),
   ];
-  
+
   for (const variant of altVariations) {
     if (driverCode.includes(variant)) {
       return driverCode.replace(variant, userCode);
     }
   }
-  
+
   // If no placeholder found, this is likely a configuration issue
   // Log a warning and return user code directly (safer than returning driver code without user code)
   console.warn(`No placeholder found in driver code for language ${language}. Placeholder expected: ${placeholder}. Using user code directly.`);
@@ -134,6 +143,27 @@ export async function submitBatch(submissions: any) {
       }
     }
 
+    const encodeB64 = (val: unknown) =>
+      Buffer.from(String(val ?? ""), "utf8").toString("base64");
+
+    const submitSingle = async (sub: any) => {
+      const res = await axios.post(
+        `${process.env.JUDGE0_API_URL}/submissions?base64_encoded=true&wait=false`,
+        {
+          language_id: sub.language_id,
+          source_code: encodeB64(sub.source_code),
+          stdin: sub.stdin ? encodeB64(sub.stdin) : undefined,
+          expected_output: sub.expected_output ? encodeB64(sub.expected_output) : undefined,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      return res.data;
+    };
+
     const postBatch = async (base64Encoded: boolean, payload: any) => {
       return await axios.post(
         `${process.env.JUDGE0_API_URL}/submissions/batch?base64_encoded=${base64Encoded ? "true" : "false"}`,
@@ -145,9 +175,6 @@ export async function submitBatch(submissions: any) {
         }
       );
     };
-
-    const encodeB64 = (val: unknown) =>
-      Buffer.from(String(val ?? ""), "utf8").toString("base64");
 
     const toBase64Submissions = (subs: any[]) =>
       subs.map((s) => ({
@@ -163,6 +190,21 @@ export async function submitBatch(submissions: any) {
       data = res.data;
     } catch (error: any) {
       const message = String(error?.response?.data?.error || error?.response?.data?.message || error?.message || "");
+      const isAuthError = error.response?.status === 401 || error.response?.status === 403 || error.response?.status === 404 || error.response?.status === 422;
+
+      if (isAuthError) {
+        console.log(`[submitBatch] Falling back to parallel single submissions due to error ${error.response?.status}`);
+        try {
+          const results = await Promise.all(submissions.map(submitSingle));
+          return results.map((r: any) => ({ token: r.token }));
+        } catch (singleError: any) {
+          console.error("[submitBatch] Single submission fallback failed:", singleError.message);
+          // If single also fails, throw original or single error. 
+          // Throwing single error is better as it is the final attempt.
+          throw singleError;
+        }
+      }
+
       // Judge0 returns this when any field can't be converted to UTF-8.
       const shouldRetryBase64 = message.toLowerCase().includes("utf-8") || message.toLowerCase().includes("base64_encoded=true");
 
@@ -193,11 +235,10 @@ export async function submitBatch(submissions: any) {
       status: error.response?.status,
       statusText: error.response?.statusText,
     });
-    
+
     // Re-throw with more context
     throw new Error(
-      `Judge0 API error: ${error.response?.status || 'Unknown'} - ${
-        error.response?.data?.error || error.response?.data?.message || error.message
+      `Judge0 API error: ${error.response?.status || 'Unknown'} - ${error.response?.data?.error || error.response?.data?.message || error.message
       }`
     );
   }
@@ -235,6 +276,18 @@ export async function pollBatchResults(tokens: any) {
 
       if (isAllDone) {
         console.log(`[pollBatchResults] All submissions completed after ${attempts} attempts`);
+
+        if (useBase64) {
+          const decode = (str: string | null) => str ? Buffer.from(str, 'base64').toString('utf-8') : null;
+          return results.map((r: any) => ({
+            ...r,
+            stdout: decode(r.stdout),
+            stderr: decode(r.stderr),
+            compile_output: decode(r.compile_output),
+            message: decode(r.message),
+          }));
+        }
+
         return results;
       }
 

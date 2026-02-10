@@ -2,10 +2,20 @@
 
 import { UserRole } from "@/app/generated/prisma/enums"
 import db from "@/lib/db"
-import { getJudge0LanguageId, pollBatchResults, submitBatch, replaceUserCodeInDriver } from "@/lib/judge0"
+import { getJudge0LanguageId, submitBatch, pollBatchResults, replaceUserCodeInDriver, getDriverCodePlaceholder } from "@/lib/judge0"
 import { currentUser } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
-import { includes, success } from "zod"
+
+// getBuiltinDriverCode and prepareUserCodeForBuiltinWrapper are now in lib/judge0 or similar, 
+// strictly speaking the original code had them inline or in piston.ts.
+// Actually, looking at the previous file read, getBuiltinDriverCode was IN THIS FILE.
+// But we should probably use the one in lib/judge0 if available, or keep using this one if it helps.
+// The task is to switch execution engine.
+// Let's check lib/judge0.ts again. It has getJudge0LanguageId, getDriverCodePlaceholder, replaceUserCodeInDriver, submitBatch, pollBatchResults.
+// It DOES NOT have getBuiltinDriverCode. 
+// So I will keep getBuiltinDriverCode here for now or if I need to move it I will.
+// Wait, the original code in actions/index.ts has getBuiltinDriverCode.
+// I will keep it there.
 
 function getBuiltinDriverCode(problemTitle: string | undefined | null, languageKey: string) {
     const title = (problemTitle || "").trim().toLowerCase();
@@ -263,8 +273,6 @@ export const runCode = async (
 ) => {
     // This is for "Run" button - runs against public test cases (stdin provided by client)
     const user = await currentUser();
-    // Verify user exists but don't strictly require DB user for just running code? 
-    // Actually existing implementation checks DB user, let's keep it.
 
     if (!user) return { success: false, error: "Unauthorized" };
 
@@ -308,147 +316,92 @@ export const runCode = async (
         console.log(`[runCode] No driver code found for ${languageKey}, using user code directly`);
     }
 
-    const judge0Id = getJudge0LanguageId(language);
+    // Judge0 Logic
+    // const compiledLanguage = getPistonLanguage(language); // REMOVED
+    const languageId = getJudge0LanguageId(language);
 
     // Validate final source code
     if (!finalSourceCode || finalSourceCode.trim().length === 0) {
         return { success: false, error: "Source code cannot be empty" };
     }
 
-    console.log(`[runCode] Language: ${language}, Judge0 ID: ${judge0Id}, Code preview: ${finalSourceCode.substring(0, 200)}...`);
+    console.log(`[runCode] Language: ${language} -> ID: ${languageId}, Code preview: ${finalSourceCode.substring(0, 200)}...`);
 
-    const submissions = stdin.map((input) => ({
-        source_code: finalSourceCode,
-        language_id: judge0Id,
-        stdin: input || "",
-        base64_encoded: false,
-    }));
-
-    // Validate submissions before sending
-    if (submissions.length === 0) {
-        return { success: false, error: "No test cases to run" };
-    }
-
-    if (submissions.some((s: any) => !s.source_code || s.language_id === undefined)) {
-        return { success: false, error: "Invalid submission data" };
-    }
-
-    let submitResponse;
     try {
-        submitResponse = await submitBatch(submissions);
-    } catch (error: any) {
-        console.error("[runCode] Error submitting to Judge0:", error);
-        return { success: false, error: error.message || "Failed to submit code to Judge0" };
-    }
+        // Prepare batch submissions
+        const submissions = stdin.map((input, i) => ({
+            language_id: languageId,
+            source_code: finalSourceCode,
+            stdin: input || "",
+            expected_output: expected_output[i] || ""
+        }));
 
-    // Handle different response formats from Judge0
-    if (!submitResponse || !Array.isArray(submitResponse)) {
-        console.error("[runCode] Invalid response from Judge0:", submitResponse);
-        return { success: false, error: "Invalid response from Judge0 API" };
-    }
+        // Submit to Judge0
+        const submissionTokens = await submitBatch(submissions);
 
-    const tokens = submitResponse.map((res: any) => res.token).filter((token: any) => token);
-
-    if (tokens.length === 0) {
-        console.error("[runCode] No tokens received from Judge0:", submitResponse);
-        return { success: false, error: "No submission tokens received from Judge0" };
-    }
-
-    let results;
-    try {
-        results = await pollBatchResults(tokens);
-    } catch (error: any) {
-        console.error("[runCode] Error polling results:", error);
-        return { success: false, error: error.message || "Failed to get execution results" };
-    }
-
-    const decodeBase64Safe = (value: string | null | undefined) => {
-        if (!value) return null;
-        // Only attempt base64 decode if it looks like base64
-        const looksBase64 = /^[A-Za-z0-9+/]+={0,2}$/.test(value) && value.length % 4 === 0;
-        if (!looksBase64) return value;
-        try {
-            const decoded = Buffer.from(value, "base64").toString("utf8");
-            // Heuristic: decoded text should have printable chars; if not, keep original
-            if (!decoded || decoded.includes("\uFFFD")) return value;
-            return decoded;
-        } catch {
-            return value;
+        // Ensure we have tokens
+        const tokens = submissionTokens.map((s: any) => s.token);
+        if (!tokens || tokens.length === 0) {
+            throw new Error("No tokens received from Judge0");
         }
-    };
 
-    // Check for compilation errors or runtime errors first
-    const hasCompilationError = results.some((r: any) => r.status.id === 6 || r.compile_output);
-    const hasRuntimeError = results.some((r: any) => r.status.id >= 7 && r.status.id <= 12);
+        // Poll for results
+        const results = await pollBatchResults(tokens);
 
-    if (hasCompilationError || hasRuntimeError) {
-        const firstError = results.find((r: any) =>
-            r.status?.id === 6 ||
-            (r.status?.id >= 7 && r.status?.id <= 12) ||
-            r.compile_output ||
-            r.stderr ||
-            r.message
-        );
+        // Map results to our format
+        const detailedResults = results.map((run: any, i: number) => {
+            const stdout = run.stdout ? Buffer.from(run.stdout, 'base64').toString('utf-8').trim() : (run.stdout === null ? null : "");
+            const stderr = run.stderr ? Buffer.from(run.stderr, 'base64').toString('utf-8').trim() : (run.stderr === null ? null : "");
+            const compile_output = run.compile_output ? Buffer.from(run.compile_output, 'base64').toString('utf-8').trim() : (run.compile_output === null ? null : "");
+            const message = run.message ? Buffer.from(run.message, 'base64').toString('utf-8').trim() : (run.message === null ? null : "");
+
+            // Status ID 3 is Accepted in Judge0
+            const isAccepted = run.status.id === 3;
+            // Verify output matches expected if not strictly accepted by Judge0 (though Judge0 checks this too if expected_output is sent)
+            // But we sent expected_output, so Judge0 status should be reliable.
+            // Let's double check manually just in case or trust Judge0.
+            // Actually, for "Run" we trust Judge0 status if we sent expected_output.
+
+            // Wait, previous Piston logic did manual check: `const passed = !isError && stdout === expected;`
+            // Judge0 returns status.id. 
+            // 3 = Accepted
+            // 4 = Wrong Answer
+            // 6 = Compilation Error
+            // 11 = Runtime Error (SIGSEGV, etc)
+
+            const passed = isAccepted;
+
+            return {
+                testCase: i + 1,
+                passed,
+                stdout,
+                expected: expected_output[i]?.trim(),
+                stderr: stderr || compile_output, // fallback to compile_output if stderr is empty?
+                compile_output,
+                message,
+                status: run.status.description,
+                statusId: run.status.id,
+                memory: run.memory + " KB",
+                time: run.time + " s",
+            };
+        });
+
+        const allPassed = detailedResults.every((r: any) => r.passed);
+
         return {
-            success: false,
-            error: firstError?.status?.description || "Compilation or Runtime Error",
+            success: true,
+            message: allPassed ? "All test cases passed!" : "Some test cases failed",
             data: {
-                status: firstError?.status?.description || "Error",
-                results: results.map((result: any, i: number) => {
-                    const stdoutDecoded = decodeBase64Safe(result.stdout);
-                    const stderrDecoded = decodeBase64Safe(result.stderr);
-                    const compileDecoded = decodeBase64Safe(result.compile_output);
-                    return {
-                        testCase: i + 1,
-                        passed: false,
-                        stdout: stdoutDecoded?.trim() || null,
-                        expected: expected_output[i]?.trim(),
-                        stderr: stderrDecoded,
-                        compile_output: compileDecoded,
-                        message: result.message || null,
-                        status: result.status.description,
-                        statusId: result.status.id,
-                        memory: result.memory ? `${result.memory} KB` : undefined,
-                        time: result.time ? `${result.time} s` : undefined,
-                    }
-                }),
+                status: allPassed ? "Accepted" : "Wrong Answer",
+                results: detailedResults,
             },
         };
+
+    } catch (error: any) {
+        console.error("[runCode] Judge0 Error:", error);
+        // If error is from submitBatch/pollBatchResults it might be "Judge0 API error..."
+        return { success: false, error: error.message || "Failed to execute code" };
     }
-
-    let allPassed = true;
-    const detailedResults = results.map((result: any, i: number) => {
-        const stdoutDecoded = decodeBase64Safe(result.stdout);
-        const stderrDecoded = decodeBase64Safe(result.stderr);
-        const compileDecoded = decodeBase64Safe(result.compile_output);
-        const stdout = stdoutDecoded?.trim() || null;
-        const expected_outputs = expected_output[i]?.trim();
-        const passed = stdout === expected_outputs;
-        if (!passed) allPassed = false;
-
-        return {
-            testCase: i + 1,
-            passed,
-            stdout,
-            expected: expected_outputs,
-            stderr: stderrDecoded,
-            compile_output: compileDecoded,
-            message: result.message || null,
-            status: result.status.description,
-            statusId: result.status.id,
-            memory: result.memory ? `${result.memory} KB` : undefined,
-            time: result.time ? `${result.time} s` : undefined,
-        };
-    });
-
-    return {
-        success: true,
-        message: allPassed ? "All test cases passed!" : "Some test cases failed",
-        data: {
-            status: allPassed ? "Accepted" : "Wrong Answer",
-            results: detailedResults,
-        },
-    };
 };
 
 export const submitCode = async (
@@ -473,7 +426,6 @@ export const submitCode = async (
     // Apply driver code if available
     let languageKey = typeof language === 'string' ? language.toUpperCase() : null;
     if (!languageKey && typeof language === 'number') {
-        // Map language ID to string key for driver code lookup
         const languageIdMap: Record<number, string> = {
             71: 'PYTHON',
             63: 'JAVASCRIPT',
@@ -492,7 +444,6 @@ export const submitCode = async (
         ? builtinDriverRaw
         : null;
 
-    // Prefer built-in drivers for seeded problems (they match our class-based snippets).
     const driverToUse = builtinDriver || driverFromDb;
 
     if (driverToUse) {
@@ -510,192 +461,142 @@ export const submitCode = async (
         return { success: false, error: "No test cases found for this problem" };
     }
 
-    const judge0Id = getJudge0LanguageId(language);
+    // Judge0 Logic
+    const languageId = getJudge0LanguageId(language);
 
     // Validate final source code
     if (!finalSourceCode || finalSourceCode.trim().length === 0) {
         return { success: false, error: "Source code cannot be empty" };
     }
 
-    console.log(`[submitCode] Language: ${language}, Judge0 ID: ${judge0Id}, Code preview: ${finalSourceCode.substring(0, 200)}...`);
+    console.log(`[submitCode] Language: ${language} -> ID: ${languageId}, Code preview: ${finalSourceCode.substring(0, 200)}...`);
 
-    const submissions = testCases.map((tc: any) => ({
-        source_code: finalSourceCode,
-        language_id: judge0Id,
-        stdin: tc.input || "",
-        expected_output: tc.output, // Adding this might help debugging if Judge0 supports it, otherwise ignored
-        base64_encoded: false,
-    }));
-
-    // Validate submissions before sending
-    if (submissions.length === 0) {
-        return { success: false, error: "No test cases to run" };
-    }
-
-    if (submissions.some((s: any) => !s.source_code || s.language_id === undefined)) {
-        return { success: false, error: "Invalid submission data" };
-    }
-
-    let submitResponse;
     try {
-        submitResponse = await submitBatch(submissions);
-    } catch (error: any) {
-        console.error("[submitCode] Error submitting to Judge0:", error);
-        return { success: false, error: error.message || "Failed to submit code to Judge0" };
-    }
+        // Prepare batch submissions
+        const submissions = testCases.map((tc: any) => ({
+            language_id: languageId,
+            source_code: finalSourceCode,
+            stdin: tc.input || "",
+            expected_output: tc.output || ""
+        }));
 
-    // Handle different response formats from Judge0
-    if (!submitResponse || !Array.isArray(submitResponse)) {
-        console.error("[submitCode] Invalid response from Judge0:", submitResponse);
-        return { success: false, error: "Invalid response from Judge0 API" };
-    }
+        // Submit to Judge0
+        const submissionTokens = await submitBatch(submissions);
 
-    const tokens = submitResponse.map((res: any) => res.token).filter((token: any) => token);
-
-    if (tokens.length === 0) {
-        console.error("[submitCode] No tokens received from Judge0:", submitResponse);
-        return { success: false, error: "No submission tokens received from Judge0" };
-    }
-
-    let results;
-    try {
-        results = await pollBatchResults(tokens);
-    } catch (error: any) {
-        console.error("[submitCode] Error polling results:", error);
-        return { success: false, error: error.message || "Failed to get execution results" };
-    }
-
-    // Check for compilation errors or runtime errors first
-    const hasCompilationError = results.some((r: any) => r.status.id === 6 || r.compile_output);
-    const hasRuntimeError = results.some((r: any) => r.status.id >= 7 && r.status.id <= 12);
-
-    if (hasCompilationError || hasRuntimeError) {
-        const firstError = results.find((r: any) =>
-            r.status?.id === 6 ||
-            (r.status?.id >= 7 && r.status?.id <= 12) ||
-            r.compile_output ||
-            r.stderr ||
-            r.message
-        );
-        return {
-            success: false,
-            error: firstError?.status?.description || "Compilation or Runtime Error",
-            data: {
-                status: firstError?.status?.description || "Error",
-                results: results.map((result: any, i: number) => ({
-                    testCase: i + 1,
-                    passed: false,
-                    stdout: result.stdout?.trim() || null,
-                    expected: testCases[i].output?.trim(),
-                    stderr: result.stderr || null,
-                    compile_output: result.compile_output || null,
-                    message: result.message || null,
-                    status: result.status.description,
-                    statusId: result.status.id,
-                    memory: result.memory ? `${result.memory} KB` : undefined,
-                    time: result.time ? `${result.time} s` : undefined,
-                })),
-            },
-        };
-    }
-
-    let allPassed = true;
-    const detailedResults = results.map((result: any, i: number) => {
-        const stdout = result.stdout?.trim() || null;
-        const expected_outputs = testCases[i].output?.trim();
-        const passed = stdout === expected_outputs;
-        if (!passed) allPassed = false;
-
-        return {
-            testCase: i + 1,
-            passed,
-            stdout,
-            expected: expected_outputs,
-            stderr: result.stderr || null,
-            compile_output: result.compile_output || null,
-            message: result.message || null,
-            status: result.status.description,
-            statusId: result.status.id,
-            memory: result.memory ? `${result.memory} KB` : undefined,
-            time: result.time ? `${result.time} s` : undefined,
-        };
-    });
-
-    // Save Submission
-    // Helper to get string lang
-    let languageString: string;
-    if (typeof language === 'number') {
-        const languageIdMap: Record<number, string> = {
-            71: 'PYTHON',
-            63: 'JAVASCRIPT',
-            62: 'JAVA',
-            54: 'CPP',
-            60: 'GOLANG',
-        };
-        languageString = languageIdMap[language] || String(language);
-    } else {
-        languageString = language.toUpperCase();
-    }
-
-    const submission = await db.submissions.create({
-        data: {
-            userId: dbUser.id,
-            problemId: problem.id,
-            sourceCode: source_code, // Store ORIGINAL user code
-            language: languageString,
-            stdin: JSON.stringify((testCases as any[]).map((tc: any) => tc.input)),
-            stdout: JSON.stringify(detailedResults.map((r: any) => r.stdout)),
-            stderr: JSON.stringify(detailedResults.map((r: any) => r.stderr)),
-            compileOutput: JSON.stringify(detailedResults.map((r: any) => r.compile_output)),
-            status: allPassed ? "Accepted" : "Wrong Answer",
-            memory: JSON.stringify(detailedResults.map((r: any) => r.memory)),
-            time: JSON.stringify(detailedResults.map((r: any) => r.time)),
+        // Ensure we have tokens
+        const tokens = submissionTokens.map((s: any) => s.token);
+        if (!tokens || tokens.length === 0) {
+            throw new Error("No tokens received from Judge0");
         }
-    });
 
-    if (allPassed) {
-        await db.problemSolved.upsert({
-            where: {
-                userId_problemId: { userId: dbUser.id, problemId: problem.id }
-            },
-            update: {},
-            create: {
+        // Poll
+        const results = await pollBatchResults(tokens);
+
+        const detailedResults = results.map((run: any, i: number) => {
+            const stdout = run.stdout ? Buffer.from(run.stdout, 'base64').toString('utf-8').trim() : (run.stdout === null ? null : "");
+            const stderr = run.stderr ? Buffer.from(run.stderr, 'base64').toString('utf-8').trim() : (run.stderr === null ? null : "");
+            const compile_output = run.compile_output ? Buffer.from(run.compile_output, 'base64').toString('utf-8').trim() : (run.compile_output === null ? null : "");
+            const message = run.message ? Buffer.from(run.message, 'base64').toString('utf-8').trim() : (run.message === null ? null : "");
+
+            const isAccepted = run.status.id === 3;
+            const passed = isAccepted;
+
+            return {
+                testCase: i + 1,
+                passed,
+                stdout,
+                expected: testCases[i].output?.trim(),
+                stderr: stderr || compile_output,
+                compile_output,
+                message,
+                status: run.status.description,
+                statusId: run.status.id,
+                memory: run.memory + " KB",
+                time: run.time + " s",
+            };
+        });
+
+        const allPassed = detailedResults.every((r: any) => r.passed);
+
+        // Save Submission
+        let languageString: string;
+        if (typeof language === 'number') {
+            const languageIdMap: Record<number, string> = {
+                71: 'PYTHON',
+                63: 'JAVASCRIPT',
+                62: 'JAVA',
+                54: 'CPP',
+                60: 'GOLANG',
+            };
+            languageString = languageIdMap[language] || String(language);
+        } else {
+            languageString = language.toUpperCase();
+        }
+
+        const submission = await db.submissions.create({
+            data: {
                 userId: dbUser.id,
-                problemId: problem.id
+                problemId: problem.id,
+                sourceCode: source_code, // Store ORIGINAL user code
+                language: languageString,
+                stdin: JSON.stringify((testCases as any[]).map((tc: any) => tc.input)),
+                stdout: JSON.stringify(detailedResults.map((r: any) => r.stdout)),
+                stderr: JSON.stringify(detailedResults.map((r: any) => r.stderr)),
+                compileOutput: JSON.stringify(detailedResults.map((r: any) => r.compile_output)),
+                status: allPassed ? "Accepted" : "Wrong Answer",
+                memory: JSON.stringify(detailedResults.map((r: any) => r.memory)),
+                time: JSON.stringify(detailedResults.map((r: any) => r.time)),
             }
-        })
-    }
+        });
 
-    const testCaseResults = detailedResults.map((result: any) => ({
-        submissionId: submission.id,
-        testCase: result.testCase,
-        passed: result.passed,
-        stdout: result.stdout,
-        expected: result.expected,
-        stderr: result.stderr,
-        compileOutput: result.compile_output,
-        status: result.status,
-        memory: result.memory,
-        time: result.time,
-    }))
+        if (allPassed) {
+            await db.problemSolved.upsert({
+                where: {
+                    userId_problemId: { userId: dbUser.id, problemId: problem.id }
+                },
+                update: {},
+                create: {
+                    userId: dbUser.id,
+                    problemId: problem.id
+                }
+            })
+        }
 
-    await db.testCaseResult.createMany({ data: testCaseResults });
-
-    const submissionWithTestCases = await db.submissions.findUnique({
-        where: { id: submission.id },
-        include: { testCases: true }
-    })
-
-    return {
-        success: true,
-        message: allPassed ? "All test cases passed!" : "Some test cases failed",
-        submission: submissionWithTestCases,
-        data: {
+        const testCaseResults = detailedResults.map((result: any) => ({
             submissionId: submission.id,
-            status: allPassed ? "Accepted" : "Wrong Answer",
-            results: detailedResults,
-        },
-    };
+            testCase: result.testCase,
+            passed: result.passed,
+            stdout: result.stdout,
+            expected: result.expected,
+            stderr: result.stderr,
+            compileOutput: result.compile_output,
+            status: result.status,
+            memory: result.memory,
+            time: result.time,
+        }))
+
+        await db.testCaseResult.createMany({ data: testCaseResults });
+
+        const submissionWithTestCases = await db.submissions.findUnique({
+            where: { id: submission.id },
+            include: { testCases: true }
+        })
+
+        return {
+            success: true,
+            message: allPassed ? "All test cases passed!" : "Some test cases failed",
+            submission: submissionWithTestCases,
+            data: {
+                submissionId: submission.id,
+                status: allPassed ? "Accepted" : "Wrong Answer",
+                results: detailedResults,
+            },
+        };
+
+    } catch (error: any) {
+        console.error("[submitCode] Judge0 Error:", error);
+        return { success: false, error: error.message || "Failed to execute code" };
+    }
 }
 
 

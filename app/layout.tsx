@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Leetcode Clone",
-  description: "Clone of Leetcode",
+  title: "duelCode",
+  description: "Leetcode like platform for duels",
 };
 
 export default function RootLayout({

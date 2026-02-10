@@ -1,0 +1,18 @@
+Starting Diagnostic...
+
+--- Testing https://ce.judge0.com ---
+GET https://ce.judge0.com/about
+✅ Success: {"version":"1.14.0","homepage":"https://judge0.com","source_code":"https://github.com/judge0/judge0","maintainer":"Herman Zvonimir Došilović <hermanz.dosilovic@gmail.com>"}
+GET https://ce.judge0.com/languages
+✅ Success: Found 71 languages.
+POST https://ce.judge0.com/submissions (Single)
+✅ Success: {"stdout":"hello\n","time":"0.01","memory":3300,"stderr":null,"token":"96dc31d1-1815-40c5-bcef-1963b3657639","compile_output":null,"message":null,"status":{"id":3,"description":"Accepted"}}
+
+--- Testing https://extra-ce.judge0.com ---
+GET https://extra-ce.judge0.com/about
+✅ Success: {"version":"1.14.0-extra","homepage":"https://judge0.com","source_code":"https://github.com/judge0/judge0","maintainer":"Herman Zvonimir Došilović <hermanz.dosilovic@gmail.com>"}
+GET https://extra-ce.judge0.com/languages
+✅ Success: Found 30 languages.
+POST https://extra-ce.judge0.com/submissions (Single)
+❌ Failed /submissions: Request failed with status code 422 422
+Response Data: {"language_id":["language with id 71 doesn't exist"]}
