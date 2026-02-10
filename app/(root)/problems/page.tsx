@@ -4,6 +4,8 @@ import { getAllProblems } from '@/modules/problems/actions';
 import { ProblemsTable } from '@/modules/problems/components/problems-table';
 import { currentUser } from '@clerk/nextjs/server'
 import React from 'react'
+import { LoginModal } from '@/components/modals/login-modal';
+
 
 const ProblemsPage = async () => {
 
@@ -30,6 +32,7 @@ const ProblemsPage = async () => {
 
   return (
     <div className='container mx-auto py-32'>
+      {!user && <LoginModal />}
       <ProblemsTable problems={problems || []} user={dbUser || null} />
     </div>
   )

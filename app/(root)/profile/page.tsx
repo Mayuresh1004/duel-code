@@ -4,6 +4,8 @@ import PlaylistsSection from '@/modules/profile/components/playlist-section';
 import ProfileStats from '@/modules/profile/components/profile-stats';
 import SolvedProblems from '@/modules/profile/components/solved-problems';
 import UserInfoCard from '@/modules/profile/components/user-info';
+import { LoginModal } from '@/components/modals/login-modal';
+
 
 import { redirect } from 'next/navigation';
 import React from 'react'
@@ -15,7 +17,7 @@ const ProfilePage = async () => {
   const profileData = await getCurrentUserData();
 
   if (!profileData) {
-    return redirect('/');
+    return <LoginModal />
   }
 
 

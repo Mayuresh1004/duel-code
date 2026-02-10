@@ -16,8 +16,12 @@ import {
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 
-export function NavbarHome({userRole}:any) {
+export function NavbarHome({ userRole }: any) {
+  const pathname = usePathname();
+  const isProblemsPage = pathname?.startsWith("/problems");
+
   const navItems = [
     {
       name: "Problems",
@@ -37,7 +41,7 @@ export function NavbarHome({userRole}:any) {
 
   return (
     <div className="w-full h-screen">
-      <Navbar>
+      <Navbar alwaysVisible={isProblemsPage}>
         {/* Desktop Navigation */}
         <NavBody>
           <NavbarLogo />
@@ -46,35 +50,35 @@ export function NavbarHome({userRole}:any) {
             <NavbarButton variant="secondary"><ModeToggle /></NavbarButton>
 
             <SignedIn>
-              {userRole && userRole===UserRole.ADMIN &&(
+              {userRole && userRole === UserRole.ADMIN && (
                 <Link href={"/create-problem"}>
                   <NavbarButton variant={"primary"} >
                     Create Problem
                   </NavbarButton>
                 </Link>
-              ) }
+              )}
               <UserButton />
             </SignedIn>
 
             <SignedOut>
 
-            <NavbarButton variant="secondary">
-              <SignInButton>
-                Sign In
-              </SignInButton>
-            </NavbarButton>
-            <NavbarButton variant="primary">
-              <SignUpButton>
-                Sign Up
-              </SignUpButton>
-            </NavbarButton>
+              <NavbarButton variant="secondary">
+                <SignInButton>
+                  Sign In
+                </SignInButton>
+              </NavbarButton>
+              <NavbarButton variant="primary">
+                <SignUpButton>
+                  Sign Up
+                </SignUpButton>
+              </NavbarButton>
 
             </SignedOut>
 
           </div>
         </NavBody>
 
-        
+
 
         {/* Mobile Navigation */}
         <MobileNav>

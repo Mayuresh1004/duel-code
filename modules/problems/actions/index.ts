@@ -170,21 +170,25 @@ export const getAllProblems = async () => {
     try {
 
         const user = await currentUser()
+        let userId = undefined;
 
-        const data = await db.user.findUnique({
-            where: {
-                clerkId: user?.id || ""
-            },
-            select: {
-                id: true
-            }
-        })
+        if (user) {
+            const dbUser = await db.user.findUnique({
+                where: {
+                    clerkId: user.id
+                },
+                select: {
+                    id: true
+                }
+            })
+            userId = dbUser?.id;
+        }
 
         const problems = await db.problem.findMany({
             include: {
                 solvedBy: {
                     where: {
-                        userId: data?.id
+                        userId: userId
                     }
                 }
             },
@@ -200,6 +204,7 @@ export const getAllProblems = async () => {
 
 
     } catch (error) {
+        console.error("Error in getAllProblems:", error);
         return {
             success: false,
             error: "Failed to fetch Problem"
