@@ -1,39 +1,114 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Code Grind
 
-## Getting Started
+Code Grind is a modern competitive programming platform built with Next.js, designed to provide a seamless coding experience similar to LeetCode. It features a robust code execution engine powered by Judge0, user authentication via Clerk, and a sleek UI.
 
-First, run the development server:
+## 🚀 Features
+
+- **Code Execution**: Run and submit code in multiple languages (Python, JavaScript, Java, C++, Go) using the Judge0 API.
+- **Problem Solving**: Solve algorithmic problems with test cases and driver code integration.
+- **User Authentication**: Secure sign-up and login powered by Clerk.
+- **Sleek UI**: Modern, responsive interface built with Shadcn UI and Tailwind CSS.
+- **Dark/Light Mode**: Fully supported theming system.
+- **Code Editor**: Powerful browser-based code editor using Monaco Editor.
+- **Submission History**: Track your past submissions and results.
+- **Playlists**: Create and manage custom problem playlists.
+- **Dashboard**: User dashboard with statistics and progress tracking.
+
+## 🛠️ Tech Stack
+
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Database**: [PostgreSQL](https://www.postgresql.org/)
+- **ORM**: [Prisma](https://www.prisma.io/)
+- **Authentication**: [Clerk](https://clerk.com/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components**: [Shadcn UI](https://ui.shadcn.com/)
+- **Code Execution**: [Judge0](https://judge0.com/)
+- **State Management**: React Hooks & Server Actions
+
+## ⚙️ Getting Started
+
+### Prerequisites
+
+- Node.js (v18+)
+- npm / pnpm / yarn
+- PostgreSQL Database
+- Clerk Account
+- Judge0 API (Self-hosted or Cloud)
+
+### Installation
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/yourusername/code-grind.git
+    cd code-grind
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    npm install
+    # or
+    pnpm install
+    ```
+
+3.  **Set up Environment Variables:**
+
+    Create a `.env` file in the root directory and add the following variables:
+
+    ```env
+    # Database
+    DATABASE_URL="postgresql://user:password@localhost:5432/codegrind"
+
+    # Authentication (Clerk)
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+    CLERK_SECRET_KEY=sk_test_...
+
+    # Judge0 API
+    # Use https://ce.judge0.com for the free public instance
+    JUDGE0_API_URL="https://ce.judge0.com"
+    NEXT_PUBLIC_JUDGE0_API_URL="https://ce.judge0.com"
+    ```
+
+4.  **Initialize the Database:**
+
+    ```bash
+    npx prisma generate
+    npx prisma db push
+    ```
+
+5.  **Run the Development Server:**
+
+    ```bash
+    npm run dev
+    # or
+    pnpm dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## 🐳 Docker Support
+
+You can also run the project using Docker Compose:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+docker-compose up -d
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📂 Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `app/`: Next.js App Router pages and layouts.
+- `components/`: Reusable UI components.
+- `lib/`: Utility functions and API clients (Judge0, etc.).
+- `modules/`: Feature-specific logic (Auth, Problems).
+- `prisma/`: Database schema and migrations.
+- `public/`: Static assets.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🤝 Contributing
 
-## Learn More
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-To learn more about Next.js, take a look at the following resources:
+## 📄 License
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-
-## This is a website like leetcode
+This project is licensed under the MIT License.
